@@ -1,6 +1,6 @@
 ﻿namespace DSharpPlus.SlashCommands.Entities
 {
-    public class InteractionResposne
+    public class InteractionResponse
     {
          
     }
