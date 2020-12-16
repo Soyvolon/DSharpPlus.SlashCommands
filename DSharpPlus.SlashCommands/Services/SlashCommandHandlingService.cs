@@ -69,7 +69,7 @@ namespace DSharpPlus.SlashCommands.Services
         /// </summary>
         /// <param name="botToken">Bot token for authentication</param>
         /// <param name="clientId">Bot Client ID, used for storing command state locally.</param>
-        public async Task Start(string botToken, ulong clientId)
+        public async Task StartAsync(string botToken, ulong clientId)
         {
             Token = botToken;
             BotId = clientId;
