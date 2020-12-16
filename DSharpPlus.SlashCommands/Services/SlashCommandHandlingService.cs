@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 using DSharpPlus.CommandsNext.Attributes;
@@ -18,6 +19,7 @@ using DSharpPlus.SlashCommands.Enums;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace DSharpPlus.SlashCommands.Services
 {
@@ -132,7 +134,10 @@ namespace DSharpPlus.SlashCommands.Services
                             && (slashAttr = slashCmdClass.GetCustomAttribute<SlashCommandAttribute>(false)) is not null)
                         { //... if it is a slash command, get or add the SlashCommand for the command ...
                             if (!commands.ContainsKey(slashAttr.Name))
-                                commands.Add(slashAttr.Name, new SlashCommand(slashAttr.Name, slashAttr.Version, Array.Empty<SlashSubcommandGroup>()));
+                                commands.Add(slashAttr.Name, new SlashCommand(slashAttr.Name, 
+                                    slashAttr.Version, 
+                                    Array.Empty<SlashSubcommandGroup>(),
+                                    slashAttr.GuildId));
 
                             if(commands.TryGetValue(slashAttr.Name, out var slashCommand))
                             { //... and then make sure it has subcommands ...
@@ -227,7 +232,8 @@ namespace DSharpPlus.SlashCommands.Services
                                 desc: cmd.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "n/a",
                                 cmd,
                                 (SlashCommandBase)instance
-                            )
+                            ),
+                            attr.GuildId
                         ));
                 }
                 // ... otherwise, ignore the method.
@@ -269,8 +275,16 @@ namespace DSharpPlus.SlashCommands.Services
                 if(Commands.TryGetValue(cmd.Name, out var slashCommand))
                 { // ... if it is there, and the version number is lower in the saved state ...
                     if (cmd.Version < slashCommand.Version)
+                    {
                         // ... queue the command for an update.
                         toUpdate.Add(slashCommand);
+                    }
+                    else
+                    { // ... otherwise, udpate the slash command with the saved values.
+                        slashCommand.CommandId = cmd.CommandId;
+                        slashCommand.GuildId = cmd.GuildId;
+                        slashCommand.ApplicationId = BotId;
+                    }
                 }
                 else
                 { // ... if its in the config but not in the code
@@ -291,8 +305,13 @@ namespace DSharpPlus.SlashCommands.Services
             await RemoveOldCommands(toRemove);
 
             _logger.LogInformation("... updates recorded to database, saving state to file ....");
-            
-            //await File.WriteAllTextAsync(ConfigPath, JsonConvert.SerializeObject(Commands, Formatting.Indented));
+
+            // ... get the configurations for all the commands ...
+            List<SlashCommandConfiguration> configs = new List<SlashCommandConfiguration>();
+            foreach (var c in Commands.Values)
+                configs.Add(c.GetConfiguration());
+            // ... and write them to the local state file.
+            await File.WriteAllTextAsync(ConfigPath, JsonConvert.SerializeObject(configs, Formatting.Indented));
 
             _logger.LogInformation("... State saved.");
         }
@@ -311,11 +330,11 @@ namespace DSharpPlus.SlashCommands.Services
                 // ... then check to see if there is a guild ID
                 if (scfg.GuildId is not null)
                 { // ... if there is, set the requset URI to a guild delete.
-                    msg.RequestUri = new Uri($"https://discord.com/applications/{BotId}/guilds/{scfg.GuildId}/commands/{scfg.CommandId}");
+                    msg.RequestUri = new Uri($"https://discord.com/api/applications/{BotId}/guilds/{scfg.GuildId}/commands/{scfg.CommandId}");
                 }
                 else
                 { // .... if there is not, set the request URI to a global delete.
-                    msg.RequestUri = new Uri($"https://discord.com/applications/{BotId}/commands/{scfg.CommandId}");
+                    msg.RequestUri = new Uri($"https://discord.com/api/applications/{BotId}/commands/{scfg.CommandId}");
                 }
                 // ... and send the request to discord ...
                 var response = await _client.SendAsync(msg);
@@ -333,15 +352,55 @@ namespace DSharpPlus.SlashCommands.Services
 
         private async Task UpdateOrAddCommand(List<SlashCommand> toUpdate)
         {
+            // For every command in the to update list ...
             foreach(var update in toUpdate)
-            {
+            { // ... get the command object ...
                 var cmd = BuildApplicationCommand(update);
-
+                // ... authenticate the request message ...
                 HttpRequestMessage msg = new();
                 msg.Headers.Authorization = new("Bot", Token);
                 msg.Method = HttpMethod.Post;
+                // ... read the command object, ignoring default and null fields ...
+                var json = JsonConvert.SerializeObject(cmd, Formatting.Indented, new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    DefaultValueHandling = DefaultValueHandling.Ignore
+                });
+                // ... set the content of the request ...
+                msg.Content = new StringContent(json);
+                msg.Content.Headers.ContentType = new("application/json");
 
+                // ... then check to see if there is a guild ID
+                if (update.GuildId is not null)
+                { // ... if there is, set the requset URI to a guild update.
+                    msg.RequestUri = new Uri($"https://discord.com/api/applications/{BotId}/guilds/{update.GuildId}/commands");
+                }
+                else
+                { // ... if there is not, set the request URI to a global update.
+                    msg.RequestUri = new Uri($"https://discord.com/api/applications/{BotId}/commands");
+                }
+                // ... then send and wait for a response ...
+                var response = await _client.SendAsync(msg);
+                // ... if the response is a success ...
+                if(response.IsSuccessStatusCode)
+                { // ... get the new command data ...
+                    var jsonResult = await response.Content.ReadAsStringAsync();
 
+                    var newCommand = JsonConvert.DeserializeObject<ApplicationCommand>(jsonResult);
+
+                    // ... and the old command data ...
+                    var oldCommand = Commands[update.Name];
+                    // ... then update the old command with the new command.
+                    if (newCommand is not null && oldCommand is not null)
+                    {
+                        oldCommand.ApplicationId = newCommand.ApplicationId;
+                        oldCommand.CommandId = newCommand.Id;
+                    }
+                }
+                else
+                { // ... otherwise log the error.
+                    _logger.LogError(await response.Content.ReadAsStringAsync());
+                }
             }
         }
 
