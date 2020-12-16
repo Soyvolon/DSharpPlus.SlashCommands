@@ -4,13 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Reflection;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands.Attributes;
 using DSharpPlus.SlashCommands.Entities;
 using DSharpPlus.SlashCommands.Entities.Builders;
@@ -19,7 +16,6 @@ using DSharpPlus.SlashCommands.Enums;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace DSharpPlus.SlashCommands.Services
 {
