@@ -47,13 +47,13 @@ namespace DSharpPlus.SlashCommands.Entities.Builders
             return this;
         }
 
-        public ApplicationCommandOptionBuilder IsDefault(bool defaultCmd)
+        public ApplicationCommandOptionBuilder IsDefault(bool? defaultCmd)
         {
             Default = defaultCmd;
             return this;
         }
 
-        public ApplicationCommandOptionBuilder IsRequired(bool required)
+        public ApplicationCommandOptionBuilder IsRequired(bool? required)
         {
             Required = required;
             return this;
@@ -66,6 +66,38 @@ namespace DSharpPlus.SlashCommands.Entities.Builders
                 throw new Exception("Cant have more than 10 choices.");
 
             Choices.Add(choices);
+            return this;
+        }
+        /// <summary>
+        /// Adds an Enum as the avalible choices. This overrides all other choices added with AddChoice.
+        /// </summary>
+        /// <param name="enumType">Enum to generate choices from.</param>
+        /// <returns>This builder</returns>
+        public ApplicationCommandOptionBuilder WithChoices(Type enumType)
+        {
+            if (!enumType.IsEnum)
+                throw new Exception("Type is not an enum");
+
+            var names = enumType.GetEnumNames();
+            var values = enumType.GetEnumValues();
+
+            List<ApplicationCommandOptionChoiceBuilder> choices = new();
+
+            for(int i = 0; i < names.Length; i++)
+            {
+                var part = new ApplicationCommandOptionChoiceBuilder()
+                    .WithName(names[i]);
+                var val = values.GetValue(i);
+                if (val is int)
+                    part.WithValue((int)val);
+                if (val is string)
+                    part.WithValue((string)val);
+
+                choices.Add(part);
+            }
+
+            Choices = choices;
+
             return this;
         }
 

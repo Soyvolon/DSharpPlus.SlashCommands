@@ -6,21 +6,26 @@ namespace DSharpPlus.SlashCommands.Entities
     public class SlashCommand
     {
         public string Name { get; set; }
-
+        public string Description { get; set; }
+        public int Version { get; set; }
         public SlashSubcommand? Command { get; init; }
 
         public Dictionary<string, SlashSubcommandGroup>? Subcommands { get; init; }
 
-        public SlashCommand(string name, SlashSubcommand command)
+        public SlashCommand(string name, int version, SlashSubcommand command)
         {
             Name = name;
+            Version = version;
+            Description = command.Description;
             Command = command;
             Subcommands = null;
         }
 
-        public SlashCommand(string name, SlashSubcommandGroup[] subcommands)
+        public SlashCommand(string name, int version, SlashSubcommandGroup[] subcommands, string desc = "n/a")
         {
             Name = name;
+            Version = version;
+            Description = desc;
             Subcommands = subcommands.ToDictionary(x => x.Name);
             Command = null;
         }
