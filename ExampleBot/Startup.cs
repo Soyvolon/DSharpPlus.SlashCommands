@@ -17,9 +17,12 @@ namespace ExampleBot
 {
     public class Startup
     {
+        public static string PublicKey = "";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            PublicKey = Configuration["PublicKey"];
         }
 
         public IConfiguration Configuration { get; }
