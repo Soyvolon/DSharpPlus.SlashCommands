@@ -5,7 +5,7 @@ using DSharpPlus.SlashCommands.Enums;
 
 namespace DSharpPlus.SlashCommands.Entities.Builders
 {
-    public class ApplicationCommandOptionBuilder
+    public class ApplicationCommandOptionBuilder : IBuilder<ApplicationCommandOption>
     {
         public ApplicationCommandOptionType Type { get; set; }
         public string Name { get; set; }

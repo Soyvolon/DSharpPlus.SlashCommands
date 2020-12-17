@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DSharpPlus.SlashCommands.Entities.Builders
 {
-    public class ApplicationCommandBuilder
+    public class ApplicationCommandBuilder : IBuilder<ApplicationCommand>
     {
         public string Name { get; set; }
         public string Description { get; set; }

@@ -2,7 +2,7 @@
 
 namespace DSharpPlus.SlashCommands.Entities.Builders
 {
-    public class ApplicationCommandOptionChoiceBuilder
+    public class ApplicationCommandOptionChoiceBuilder : IBuilder<ApplicationCommandOptionChoice>
     {
         public string Name { get; set; }
 
@@ -14,7 +14,7 @@ namespace DSharpPlus.SlashCommands.Entities.Builders
         public ApplicationCommandOptionChoiceBuilder()
         {
             Name = "";
-            Value = null;
+            Value = 0;
         }
 
         public ApplicationCommandOptionChoiceBuilder WithName(string name)
