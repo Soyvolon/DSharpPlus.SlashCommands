@@ -11,8 +11,6 @@ using DSharpPlus.SlashCommands.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-using NaCl.Core;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
