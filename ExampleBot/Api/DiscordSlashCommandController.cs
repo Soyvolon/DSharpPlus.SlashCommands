@@ -44,24 +44,23 @@ namespace ExampleBot.Api
                 var signature = Request.Headers["X-Signature-Ed25519"].ToString();
                 var timestamp = Request.Headers["X-Signature-Timestamp"].ToString();
 
-                using var mdCrypto = new MD5CryptoServiceProvider();
-
-                var byteKey = Utils.HexToBytes(Startup.PublicKey);
-                var byteSig = Utils.HexToBytes(signature);
-
                 var reader = new StreamReader(Request.Body);
                 if (reader.BaseStream.CanSeek)
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
                 raw = await reader.ReadToEndAsync();
-
-                var md5 = MD5.Create();
-
-                MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(timestamp + raw));
-
-                var bodyHash = await md5.ComputeHashAsync(ms);
-
                 
+                var byteBody = Encoding.UTF8.GetBytes(timestamp + raw);
 
+                var miniKey = Minisign.Core.LoadPublicKeyFromString(Startup.PublicKey);
+                var miniSig = Minisign.Core.LoadSignatureFromString(signature, "Ed25519", "Ed25519");
+
+                var validated = Minisign.Core.ValidateSignature(byteBody, miniSig, miniKey);
+
+                if(!validated)
+                {
+                    _logger.LogWarning("Failed to validate POST request from Discord.");
+                    return Unauthorized("Invalid Request Signature");
+                }
             }
             catch (Exception ex)
             {
