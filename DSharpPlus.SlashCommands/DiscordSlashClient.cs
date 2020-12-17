@@ -57,7 +57,7 @@ namespace DSharpPlus.SlashCommands
         /// <returns>Handle Webhook operation</returns>
         public async Task HandleWebhookPost(HttpRequest request)
         {
-
+            
         }
 
         /// <summary>
