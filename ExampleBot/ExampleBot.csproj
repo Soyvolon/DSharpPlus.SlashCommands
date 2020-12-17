@@ -15,4 +15,8 @@
     <ProjectReference Include="..\DSharpPlus.SlashCommands\DSharpPlus.SlashCommands.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Commands\Discord\" />
+  </ItemGroup>
+
 </Project>

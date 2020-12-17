@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 using DSharpPlus.CommandsNext.Attributes;
@@ -36,6 +37,9 @@ namespace DSharpPlus.SlashCommands.Services
 
         private ConcurrentDictionary<string, SlashCommand> Commands { get; set; }
         private List<Assembly> Assemblies { get; set; }
+
+        private ConcurrentDictionary<Interaction, Tuple<Task, CancellationTokenSource>> RunningInteractions;
+
 
         /// <summary>
         /// Create a new Slash Command Service. Best used by adding it into a service collection, then pulling it once and running start. Or,
@@ -78,6 +82,58 @@ namespace DSharpPlus.SlashCommands.Services
             await VerifyCommandState();
         }
 
+        public Task HandleInteraction(Interaction interact)
+        {
+            // This should not get here, but check just in case.
+            if (interact.Type == InteractionType.Ping) return Task.CompletedTask;
+            // Create a cancellation token for the event in which it is needed.
+            var cancelSource = new CancellationTokenSource();
+            // Store the command task in a ConcurrentDictionary and continue with execution to not hodlup the webhook response.
+            RunningInteractions[interact] = new(
+                Task.Run(async () => await ExecuteInteraction(interact, cancelSource.Token)),
+                cancelSource);
+
+            return Task.CompletedTask;
+        }
+
+        private async Task ExecuteInteraction(Interaction interact, CancellationToken cancellationToken)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (interact.Data is null)
+                    throw new Exception("Interact object has no command data.");
+
+                if(Commands.TryGetValue(interact.Data.Name, out var cmd))
+                { // TODO: Check how subcommands are returned.
+                    // TODO: Do argument parsing.
+
+                    cmd.ExecuteCommand();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Interaction Handler failed");
+            }
+            finally
+            {
+                if(RunningInteractions.TryRemove(interact, out var taskData))
+                {
+                    try
+                    {
+                        taskData.Item1.Dispose();
+                        taskData.Item2.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Interact task failed to dispose itself.");
+                    }
+                }
+            }
+        }
+
+        #region Command Registration
         /// <summary>
         /// Loads the commands from the assembly.
         /// </summary>
@@ -483,5 +539,6 @@ namespace DSharpPlus.SlashCommands.Services
             // ... then return the builders list.
             return builders;
         }
+        #endregion
     }
 }
