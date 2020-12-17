@@ -10,7 +10,7 @@ using DSharpPlus.SlashCommands.Services;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -20,6 +20,13 @@ namespace ExampleBot.Api
     [ApiController]
     public class DiscordSlashCommandController : ControllerBase
     {
+        private readonly ILogger _logger;
+
+        public DiscordSlashCommandController(ILogger<DiscordSlashCommandController> logger)
+        {
+            _logger = logger;
+        }
+
         private struct DiscordChallenge
         {
             [JsonProperty("type")]
@@ -37,7 +44,7 @@ namespace ExampleBot.Api
                 var signature = Request.Headers["X-Signature-Ed25519"].ToString();
                 var timestamp = Request.Headers["X-Signature-Timestamp"].ToString();
 
-                using var rsa = new RSACryptoServiceProvider();
+                using var mdCrypto = new MD5CryptoServiceProvider();
 
                 var byteKey = Utils.HexToBytes(Startup.PublicKey);
                 var byteSig = Utils.HexToBytes(signature);
@@ -47,21 +54,18 @@ namespace ExampleBot.Api
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
                 raw = await reader.ReadToEndAsync();
 
-                var sha = SHA256.Create();
+                var md5 = MD5.Create();
 
                 MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(timestamp + raw));
 
-                var bodyHash = await sha.ComputeHashAsync(ms);
+                var bodyHash = await md5.ComputeHashAsync(ms);
 
-                rsa.ImportRSAPublicKey(byteKey, out _);
+                
 
-                bool verified = rsa.VerifyHash(bodyHash, CryptoConfig.MapNameToOID("SHA256"), byteSig);
-
-                if (!verified)
-                    return Unauthorized("Invalid Request Signature");
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Decryption failed.");
                 return Unauthorized("Invalid Request Signature");
             }
 
