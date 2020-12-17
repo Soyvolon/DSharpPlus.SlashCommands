@@ -14,6 +14,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+using Sodium;
+
 namespace ExampleBot.Api
 {
     [Route("api/discordslash")]
@@ -44,27 +46,29 @@ namespace ExampleBot.Api
                 var signature = Request.Headers["X-Signature-Ed25519"].ToString();
                 var timestamp = Request.Headers["X-Signature-Timestamp"].ToString();
 
-                var reader = new StreamReader(Request.Body);
+                var byteSig = Utils.HexToBytes(signature);
+                var byteKey = Utils.HexToBytes(Startup.PublicKey);
+
+                using var reader = new StreamReader(Request.Body);
                 if (reader.BaseStream.CanSeek)
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
                 raw = await reader.ReadToEndAsync();
-                
-                var byteBody = Encoding.UTF8.GetBytes(timestamp + raw);
 
-                var miniKey = Minisign.Core.LoadPublicKeyFromString(Startup.PublicKey);
-                var miniSig = Minisign.Core.LoadSignatureFromString(signature, "Ed25519", "Ed25519");
+                string body = timestamp + raw;
+                var byteBody = Encoding.Default.GetBytes(body);
 
-                var validated = Minisign.Core.ValidateSignature(byteBody, miniSig, miniKey);
+                bool validated = PublicKeyAuth.VerifyDetached(byteSig, byteBody, byteKey);
 
                 if(!validated)
                 {
-                    _logger.LogWarning("Failed to validate POST request from Discord.");
+                    _logger.LogWarning("Failed to validate POST request for Discord API.");
                     return Unauthorized("Invalid Request Signature");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Decryption failed.");
+                _logger.LogInformation(ex, "Decryption failed.");
+                _logger.LogWarning("Failed to validate POST request for Discord API.");
                 return Unauthorized("Invalid Request Signature");
             }
 
