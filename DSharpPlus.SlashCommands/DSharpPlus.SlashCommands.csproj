@@ -4,18 +4,18 @@
     <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
     <PackageId>Soyvolon.DSharpPlus.SlashCommands</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Authors>Soyvolon</Authors>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
 
     <Title>DSharpPlus based SlashCommnads</Title>
-    <Description>>A SlashCommnad library that uses DSharpPlus to encoperate SlashCommands for Discord</Description>
+    <Description>&gt;A SlashCommnad library that uses DSharpPlus to encoperate SlashCommands for Discord</Description>
     <RepositoryUrl>https://github.com/Soyvolon/DSharpPlus.SlashCommands</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00766" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00766" />
+    <PackageReference Include="DSharpPlus" Version="4.0.0-rc1" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-rc1" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
