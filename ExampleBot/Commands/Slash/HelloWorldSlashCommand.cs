@@ -11,7 +11,7 @@ using DSharpPlus.SlashCommands.Enums;
 
 namespace ExampleBot.Commands.Slash
 {
-    public class HelloWorldSlashCommand : SlashCommandBase
+    public class HelloWorldSlashCommand : BaseSlashCommandModule
     {
         public HelloWorldSlashCommand(IServiceProvider proivder) : base(proivder) { }
 
