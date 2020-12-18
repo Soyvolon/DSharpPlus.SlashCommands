@@ -31,12 +31,6 @@ namespace ExampleBot.Api
             _logger = logger;
         }
 
-        private struct DiscordChallenge
-        {
-            [JsonProperty("type")]
-            public int type { get; set; }
-        }
-
         [HttpPost("")]
         //[ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> DiscordEndpointHandler()
@@ -49,8 +43,8 @@ namespace ExampleBot.Api
                 var signature = Request.Headers["X-Signature-Ed25519"].ToString();
                 var timestamp = Request.Headers["X-Signature-Timestamp"].ToString();
                 // ... convert the signature and public key to byte[] to use in verification ...
-                var byteSig = Utils.HexToBytes(signature);
-                var byteKey = Utils.HexToBytes(Startup.PublicKey);
+                var byteSig = Utils.HexStringToByteArray(signature);
+                var byteKey = Utils.HexStringToByteArray(Startup.PublicKey);
                 // ... read the body from the request ...
                 using var reader = new StreamReader(Request.Body);
                 if (reader.BaseStream.CanSeek)

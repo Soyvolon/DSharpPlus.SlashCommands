@@ -7,24 +7,23 @@ namespace ExampleBot
 {
     public static class Utils
     {
-        public static byte[] HexToBytes(string hexString)
+        public static readonly int[] HexValue = new int[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05,
+       0x06, 0x07, 0x08, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+       0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+
+        // Code Snippet from: https://stackoverflow.com/a/5919521/11682098
+        // Code Snippet by: Nathan Moinvaziri
+        public static byte[] HexStringToByteArray(string Hex)
         {
-            if ((hexString.Length & 1) != 0)
-            {
-                throw new ArgumentException("Input must have even number of characters");
-            }
-            byte[] ret = new byte[hexString.Length / 2];
-            for (int i = 0; i < ret.Length; i++)
-            {
-                int high = hexString[i * 2];
-                int low = hexString[i * 2 + 1];
-                high = (high & 0xf) + ((high & 0x40) >> 6) * 9;
-                low = (low & 0xf) + ((low & 0x40) >> 6) * 9;
+            byte[] Bytes = new byte[Hex.Length / 2];
 
-                ret[i] = (byte)((high << 4) | low);
+            for (int x = 0, i = 0; i < Hex.Length; i += 2, x += 1)
+            {
+                Bytes[x] = (byte)(HexValue[Char.ToUpper(Hex[i + 0]) - '0'] << 4 |
+                                  HexValue[Char.ToUpper(Hex[i + 1]) - '0']);
             }
 
-            return ret;
+            return Bytes;
         }
     }
 }
