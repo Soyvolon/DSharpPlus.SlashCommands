@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 
+using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands.Entities;
 using DSharpPlus.SlashCommands.Entities.Builders;
 using DSharpPlus.SlashCommands.Services;
@@ -82,8 +83,8 @@ namespace DSharpPlus.SlashCommands
                 // ... and tell the handler to run the command ...
 
                 var jobj = JObject.Parse(requestBody);
-                DiscordMember testM = jobj["member"].GetObject<DiscordMember>();
-                DiscordUser testU = jobj["member"]["user"].GetObject<DiscordUser>();
+                DiscordMember testM = jobj["member"].ToObject<DiscordMember>();
+                DiscordUser testU = jobj["member"]["user"].ToObject<DiscordUser>();
 
                 await _slash.HandleInteraction(i, this);
             }
