@@ -18,8 +18,8 @@ namespace DSharpPlus.SlashCommands.Entities
         public ulong GuildId { get; internal set; }
         [JsonProperty("channel_id")]
         public ulong ChannelId { get; internal set; }
-        [JsonProperty("member")]
-        public DiscordMember Member { get; internal set; }
+        [JsonIgnore]
+        public DiscordUser User { get; internal set; }
         [JsonProperty("token")]
         public string Token { get; internal set; }
         [JsonProperty("version")]

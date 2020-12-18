@@ -83,8 +83,9 @@ namespace DSharpPlus.SlashCommands
                 // ... and tell the handler to run the command ...
 
                 var jobj = JObject.Parse(requestBody);
-                DiscordMember testM = jobj["member"].ToObject<DiscordMember>();
-                DiscordUser testU = jobj["member"]["user"].ToObject<DiscordUser>();
+                DiscordUser user = jobj["member"]["user"].ToObject<DiscordUser>();
+
+                i.User = user;
 
                 await _slash.HandleInteraction(i, this);
             }
@@ -130,7 +131,8 @@ namespace DSharpPlus.SlashCommands
             var request = new HttpRequestMessage();
             request.Method = HttpMethod.Post;
             request.RequestUri = GetPostFollowupUri(token);
-            request.Content = new StringContent(JsonConvert.SerializeObject(followup, _jsonSettings));
+            string json = JsonConvert.SerializeObject(followup, _jsonSettings);
+            request.Content = new StringContent(json);
             request.Content.Headers.ContentType = new(_contentType);
 
             var res = await _http.SendAsync(request);
