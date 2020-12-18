@@ -84,7 +84,7 @@ namespace DSharpPlus.SlashCommands
                 // ... and tell the handler to run the command ...
 
                 var jobj = JObject.Parse(requestBody);
-                DiscordUser user = jobj["member"]["user"].ToObject<DiscordUser>();
+                DiscordUser? user = jobj["member"]?["user"]?.ToObject<DiscordUser>();
 
                 i.User = user;
 
