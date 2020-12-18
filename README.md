@@ -12,7 +12,7 @@ A SlashCommand implementation for DSharpPlus. This does not connect to the gatew
 ## Install the Lib
 **Nuget Package:** `Soyvolon.DSharpPlus.SlashCommands`
 ## Creating a new Project
-As this lib currently only supports Webhook interaction, make sure to create an ASP.NET Core Web application. It is recommneded to use an ASP.NET Core Web API if nothing else will be created on the web app.
+As this lib currently only supports Webhook interaction, make sure to create an ASP.NET Core Web application. It is recommended to use an ASP.NET Core Web API if nothing else will be created on the web app.
 
 ## Create the `DiscordSlashClient`
 A Discord Slash Client requires two things:
@@ -35,20 +35,20 @@ Then, just like in DSharpPlus, pass the Configuration into the constructor for t
 var client = new DiscordSlashClient(config);
 ```
 
-You can customize the `DiscordSlashClient`'s custom responses with additionl options in the configuration. For Example:
+You can customize the `DiscordSlashClient`'s custom responses with additional options in the configuration. For Example:
 ```csharp
 DefaultResponseType = InteractionResponseType.ChannelMessageWithSource,
 DefaultResponseData = new InteractionApplicationCommandCallbackDataBuilder()
 ```
 
 ## Adding Commands
-Commands are created simillary to in `DSharpPlus.CommandsNext`. Some of the attributes that are looked for in commands are taken from `CommandsNext`.
+Commands are created similarly to in `DSharpPlus.CommandsNext`. Some of the attributes that are looked for in commands are taken from `CommandsNext`.
 
-A command with no subcommnads can be created like this:
+A command with no subcommands can be created like this:
 ```csharp
 public class HelloWorldSlashCommand : BaseSlashCommandModule
 {
-    public HelloWorldSlashCommand(IServiceProvider proivder) : base(proivder) { }
+    public HelloWorldSlashCommand(IServiceProvider provider) : base(provider) { }
 
     [SlashCommand("hello", 1, 750486424469372970)]
     public async Task HelloWorldSlashCommandAsync(InteractionContext ctx)
@@ -80,11 +80,11 @@ await client.StartAsync();
 After you have registered commands.
 
 As the client starts, it will build a JSON file inside the executing assembly. This JSON file is needed to tell the Library what commands have already been registered with Discord. It is named `sccfg_<client ID>.json`.
-> Deleting the JSON file can case unexpected command behavior where commands dont get delted when they are supposed to, or commands are not updated correctly after version numbers update.
+> Deleting the JSON file can case unexpected command behavior where commands don't get deleted when they are supposed to, or commands are not updated correctly after version numbers update.
 
 > This JSON file is for a single application only, running the same client on two different applications can cause unexpected behavior as well.
 
-## Handling Incomding Webhooks
+## Handling Incoming Webhooks
 Now that the `DiscordSlashClient` is running, you need to handle incoming webhooks from Discord.
 
 Create a new `Controller` in your ASP.NET Core project. In this example, we also get the ASP.NET Core logger to log events in the API:
@@ -101,7 +101,7 @@ public class DiscordSlashCommandController : ControllerBase
     }
 }
 ```
-The `[Route("api/discordslash")]` attribute determines where the program needs to listen for incomding requests. In this case, we are listening at `https://slash.example.com/api/discordslash` for incoming requests.
+The `[Route("api/discordslash")]` attribute determines where the program needs to listen for incoming requests. In this case, we are listening at `https://slash.example.com/api/discordslash` for incoming requests.
 
 The `[ApiController]` attribute tells ASP.NET that this class is apart of our API.
 
@@ -179,7 +179,7 @@ try
     }
 }
 catch (Exception ex)
-{ // ... if an error occoured, log the error and return at 401 Unauthorized.
+{ // ... if an error occurred, log the error and return at 401 Unauthorized.
     _logger.LogInformation(ex, "Decryption failed.");
     _logger.LogWarning("Failed to validate POST request for Discord API.");
     return Unauthorized("Invalid Request Signature");
@@ -193,7 +193,7 @@ As explained in the code comments, this snippet does the following:
 3. Converts your application's public key (see discord developers page for your application to obtain this) into a `byte[]`.
 4. Combines the timestamp and request body, and parses it into a `byte[]`.
 5. Takes the three `byte[]`s and uses Sodium Core to validate the request.
-6. If the code is invalid, returns the required `401 Unauthroized`, otherwise continues onward.
+6. If the code is invalid, returns the required `401 Unauthorized`, otherwise continues onward.
 
 After the request is validated, we can parse the request into either a `PONG` response, or pass it to the `DiscordSlashClient` which will return the default response for us to send back to Discord.
 
@@ -230,7 +230,7 @@ else
 {// ... then pass the raw request body to the client ...
     var response = await client.HandleWebhookPost(raw);
     if (response is not null) // ... if the clients response is not null ...
-        return Ok(JsonConvert.SerializeObject(response)); // ... serialie it and send it.
+        return Ok(JsonConvert.SerializeObject(response)); // ... serialize it and send it.
     else return BadRequest("Failed to parse request JSON."); // ... or send a bad request message.
 }
 ```
@@ -301,7 +301,7 @@ namespace ExampleBot.Api
                 }
             }
             catch (Exception ex)
-            { // ... if an error occoured, log the error and return at 401 Unauthorized.
+            { // ... if an error occurred, log the error and return at 401 Unauthorized.
                 _logger.LogInformation(ex, "Decryption failed.");
                 _logger.LogWarning("Failed to validate POST request for Discord API.");
                 return Unauthorized("Invalid Request Signature");
@@ -332,7 +332,7 @@ namespace ExampleBot.Api
             {// ... then pass the raw request body to the client ...
                 var response = await Program.Slash.HandleWebhookPost(raw);
                 if (response is not null) // ... if the clients response is not null ...
-                    return Ok(JsonConvert.SerializeObject(response)); // ... serialie it and send it.
+                    return Ok(JsonConvert.SerializeObject(response)); // ... serialize it and send it.
                 else return BadRequest("Failed to parse request JSON."); // ... or send a bad request message.
             }
         }
@@ -340,11 +340,11 @@ namespace ExampleBot.Api
 }
 ```
 ## Telling Discord to send you Interactions over webhooks
-In order for everything to work, Discord needs to know to send you information over Webhook and not the Gateway. This means you need at least a development version of the bot running on the server you intend to relase it to.
+In order for everything to work, Discord needs to know to send you information over Webhook and not the Gateway. This means you need at least a development version of the bot running on the server you intend to release it to.
 
 Once the bot is running, and your API is ready to receive requests, head over to your discord developer portal and select your application. In the General Information tab, near the bottom there is an Interactions Endpoint URL field. Input your API endpoint there. For example, using the URL that was used earlier our endpoint would be: `https://slash.example.com/api/discordslash`
 
-Once you hit save, Discord is going to send a `POST` request to your URL (thus why it needs to be port-forwareded or on a server). This is where the Ping response comes in. Your app will recgonize the Ping, respond with Pong, and Discord will save your endpoint.
+Once you hit save, Discord is going to send a `POST` request to your URL (thus why it needs to be port-forwarded or on a server). This is where the Ping response comes in. Your app will recognize the Ping, respond with Pong, and Discord will save your endpoint.
 
 > **Congrats, you now have SlashCommands setup!** <br />
 *Example code was from the ExampleBot project.*

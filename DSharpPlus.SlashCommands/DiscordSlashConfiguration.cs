@@ -15,7 +15,7 @@ namespace DSharpPlus.SlashCommands
         /// </summary>
         public ulong ClientId { get; set; }
         /// <summary>
-        /// The Default Response type that is sent to Discord upon receving a request.
+        /// The Default Response type that is sent to Discord upon receiving a request.
         /// </summary>
         public InteractionResponseType DefaultResponseType { get; set; } = InteractionResponseType.ACKWithSource;
         /// <summary>

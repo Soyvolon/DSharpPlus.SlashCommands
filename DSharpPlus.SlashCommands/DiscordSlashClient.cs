@@ -66,10 +66,10 @@ namespace DSharpPlus.SlashCommands
             if ((_config.DefaultResponseType != Enums.InteractionResponseType.Acknowledge
                 && _config.DefaultResponseType != Enums.InteractionResponseType.ACKWithSource)
                 && _config.DefaultResponseData is null)
-                throw new Exception("DeafultResposneData must not be null if not using ResponseType of Acknowledge or ACKWithSource.");
+                throw new Exception("DeafultResponseData must not be null if not using ResponseType of Acknowledge or ACKWithSource.");
                 
 
-            // Initalize the command handling service (and therefor updating command on discord).
+            // Initialize the command handling service (and therefor updating command on discord).
             await _slash.StartAsync(_config.Token, _config.ClientId);
         }
 
@@ -87,7 +87,7 @@ namespace DSharpPlus.SlashCommands
 
                 var jobj = JObject.Parse(requestBody);
                 DiscordUser? user = jobj["member"]?["user"]?.ToObject<DiscordUser>();
-                // ... because we cant seralize direct to a DiscordMember, we are working around this
+                // ... because we cant serialize direct to a DiscordMember, we are working around this
                 // and using a DiscordUser instead. I would have to set the Lib as upstream to this before I
                 // would be able to change this.
                 i.User = user;
@@ -113,9 +113,9 @@ namespace DSharpPlus.SlashCommands
         }
 
         /// <summary>
-        /// Updates the origial interaction response.
+        /// Updates the original interaction response.
         /// </summary>
-        /// <param name="iteraction">New version of the response</param>
+        /// <param name="edit">New version of the response</param>
         /// <returns>Update task</returns>
         internal async Task<DiscordMessage?> UpdateAsync(InteractionResponse edit, string token)
         {
@@ -126,7 +126,7 @@ namespace DSharpPlus.SlashCommands
             var request = new HttpRequestMessage()
             {
                 Method = HttpMethod.Patch,
-                RequestUri = GetEditOrDeleteInitalUri(token),
+                RequestUri = GetEditOrDeleteInitialUri(token),
                 Content = new StringContent(edit.BuildWebhookEditBody(_jsonSettings)),
             };
             request.Content.Headers.ContentType = new(_contentType);
@@ -141,9 +141,9 @@ namespace DSharpPlus.SlashCommands
         }
 
         /// <summary>
-        /// Deletes the origial response
+        /// Deletes the original response
         /// </summary>
-        /// <param name="interaction">Interacton to delete.</param>
+        /// <param name="token">Token for the default interaction to be delete.</param>
         /// <returns>Delete task</returns>
         internal async Task<DiscordMessage?> DeleteAsync(string token)
         {
@@ -154,7 +154,7 @@ namespace DSharpPlus.SlashCommands
             var request = new HttpRequestMessage()
             {
                 Method = HttpMethod.Delete,
-                RequestUri = GetEditOrDeleteInitalUri(token),
+                RequestUri = GetEditOrDeleteInitialUri(token),
             };
 
             var res = await _http.SendAsync(request);
@@ -170,7 +170,7 @@ namespace DSharpPlus.SlashCommands
         /// Follow up the interaction response with a new response.
         /// </summary>
         /// <param name="followup">New response to send.</param>
-        /// <param name="token">Origianl response token.</param>
+        /// <param name="token">Original response token.</param>
         /// <returns>The DiscordMessage that was created.</returns>
         internal async Task<DiscordMessage?> FollowupWithAsync(InteractionResponse followup, string token)
         {
@@ -195,7 +195,7 @@ namespace DSharpPlus.SlashCommands
         /// Edits a followup message from a response.
         /// </summary>
         /// <param name="message">New message to replace the old one with.</param>
-        /// <param name="token">Origial response token.</param>
+        /// <param name="token">Original response token.</param>
         /// <param name="id">Id of the followup message that you want to edit.</param>
         /// <returns>Edit task</returns>
         internal async Task<DiscordMessage?> EditAsync(InteractionResponse edit, string token, ulong id)
@@ -232,7 +232,7 @@ namespace DSharpPlus.SlashCommands
             }
         }
 
-        protected Uri GetEditOrDeleteInitalUri(string token)
+        protected Uri GetEditOrDeleteInitialUri(string token)
         {
             return new Uri($"{api}/webhooks/{_config.ClientId}/{token}/messages/@original");
         }
