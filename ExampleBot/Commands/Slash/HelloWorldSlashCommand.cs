@@ -19,9 +19,9 @@ namespace ExampleBot.Commands.Slash
     {
         TestService service;
 
-        public HelloWorldSlashCommand(IServiceProvider proivder) : base(proivder) 
+        public HelloWorldSlashCommand(IServiceProvider provider) : base(provider) 
         {
-            service = proivder.GetService<TestService>();
+            service = provider.GetService<TestService>();
         }
 
         [SlashCommand("hello", 1, 750486424469372970)]
