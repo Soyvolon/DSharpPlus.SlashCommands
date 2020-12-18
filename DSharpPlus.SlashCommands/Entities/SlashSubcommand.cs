@@ -8,9 +8,9 @@ namespace DSharpPlus.SlashCommands.Entities
         public string Name { get; init; }
         public string Description { get; init; }
         public MethodInfo ExecutionMethod { get; init; }
-        public SlashCommandBase BaseCommand { get; init; }
+        public BaseSlashCommandModule BaseCommand { get; init; }
 
-        public SlashSubcommand(string name, string desc, MethodInfo method, SlashCommandBase commandInstance)
+        public SlashSubcommand(string name, string desc, MethodInfo method, BaseSlashCommandModule commandInstance)
         {
             Name = name;
             Description = desc;

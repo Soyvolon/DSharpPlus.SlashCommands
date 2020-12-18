@@ -134,7 +134,7 @@ namespace DSharpPlus.SlashCommands.Services
         {
             _logger.LogInformation("Building Slash Command Objects ...");
             // Get the base command class type...
-            var cmdType = typeof(SlashCommandBase);
+            var cmdType = typeof(BaseSlashCommandModule);
             // ... and all the methods in it...
             var commandMethods = cmdType.GetMethods().ToList();
 
@@ -171,7 +171,7 @@ namespace DSharpPlus.SlashCommands.Services
                     if(subGroupClass is not null 
                         && (subGroupAttr = subGroupClass.GetCustomAttribute<SlashSubcommandGroupAttribute>(false)) is not null)
                     { //... if it is a subcommand group, get the class the subcommand group is in...
-                        var slashCmdClass = cmd.DeclaringType;
+                        var slashCmdClass = subGroupClass.BaseType;
                         // ... and the SlashCommand attribute for that class...
                         SlashCommandAttribute? slashAttr;
                         if(slashCmdClass is not null
@@ -210,7 +210,7 @@ namespace DSharpPlus.SlashCommands.Services
                                         new SlashSubcommand(attr.Name,
                                             desc: cmd.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "n/a",
                                             cmd,
-                                            (SlashCommandBase)instance
+                                            (BaseSlashCommandModule)instance
                                             )
                                         );
                                 }
@@ -226,7 +226,7 @@ namespace DSharpPlus.SlashCommands.Services
                         }
                         else
                         { // ... otherwise tell the user a subcommand group needs to be in a slash command class
-                            throw new Exception("A Subcommand Group is required to be inside a class marked with a SlashCommand attribute");
+                            throw new Exception("A Subcommand Group is required to be a child of a class marked with a SlashCommand attribute");
                         }
                     }
                     else
@@ -258,7 +258,7 @@ namespace DSharpPlus.SlashCommands.Services
                         throw new Exception($"A command with the name {attr.Name} already exsists.");
                     // ... and that it has a declaring type AND that type is a subclass of SlashCommandBase ...
                     if (cmd.DeclaringType is null 
-                        || !cmd.DeclaringType.IsSubclassOf(typeof(SlashCommandBase)))
+                        || !cmd.DeclaringType.IsSubclassOf(typeof(BaseSlashCommandModule)))
                         throw new Exception("A SlashCommand method needs to be in a class.");
                     // ... then build and instance of the class ...
                     // TODO: Actually make this dependency injection isntead of just passing the
@@ -275,7 +275,7 @@ namespace DSharpPlus.SlashCommands.Services
                                 attr.Name,
                                 desc: cmd.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "n/a",
                                 cmd,
-                                (SlashCommandBase)instance
+                                (BaseSlashCommandModule)instance
                             ),
                             attr.GuildId
                         ));

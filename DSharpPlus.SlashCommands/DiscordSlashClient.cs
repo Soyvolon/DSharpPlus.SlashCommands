@@ -85,7 +85,9 @@ namespace DSharpPlus.SlashCommands
 
                 var jobj = JObject.Parse(requestBody);
                 DiscordUser? user = jobj["member"]?["user"]?.ToObject<DiscordUser>();
-
+                // ... because we cant seralize direct to a DiscordMember, we are working around this
+                // and using a DiscordUser instead. I would have to set the Lib as upstream to this before I
+                // would be able to change this.
                 i.User = user;
 
                 await _slash.HandleInteraction(i, this);
@@ -106,9 +108,23 @@ namespace DSharpPlus.SlashCommands
         /// </summary>
         /// <param name="iteraction">New version of the response</param>
         /// <returns>Update task</returns>
-        internal async Task UpdateAsync(InteractionResponse iteraction)
+        internal async Task<DiscordMessage?> UpdateAsync(InteractionResponse edit, string token)
         {
-            
+            var request = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Patch,
+                RequestUri = GetEditOrDeleteInitalUri(token),
+                Content = new StringContent(edit.BuildWebhookEditBody(_jsonSettings)),
+            };
+            request.Content.Headers.ContentType = new(_contentType);
+
+            var res = await _http.SendAsync(request);
+
+            if (res.IsSuccessStatusCode)
+            {
+                return await GetResponseBody(res);
+            }
+            else return null;
         }
 
         /// <summary>
@@ -116,9 +132,21 @@ namespace DSharpPlus.SlashCommands
         /// </summary>
         /// <param name="interaction">Interacton to delete.</param>
         /// <returns>Delete task</returns>
-        internal async Task DeleteAsync(InteractionResponse interaction)
+        internal async Task<DiscordMessage?> DeleteAsync(string token)
         {
+            var request = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Delete,
+                RequestUri = GetEditOrDeleteInitalUri(token),
+            };
 
+            var res = await _http.SendAsync(request);
+
+            if (res.IsSuccessStatusCode)
+            {
+                return await GetResponseBody(res);
+            }
+            else return null;
         }
 
         /// <summary>
@@ -129,28 +157,19 @@ namespace DSharpPlus.SlashCommands
         /// <returns>The DiscordMessage that was created.</returns>
         internal async Task<DiscordMessage?> FollowupWithAsync(InteractionResponse followup, string token)
         {
-            var request = new HttpRequestMessage();
-            request.Method = HttpMethod.Post;
-            request.RequestUri = GetPostFollowupUri(token);
-            string json = followup.BuildWebhookBody(_jsonSettings);
-            request.Content = new StringContent(json);
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = GetPostFollowupUri(token),
+                Content = new StringContent(followup.BuildWebhookBody(_jsonSettings))
+            };
             request.Content.Headers.ContentType = new(_contentType);
 
             var res = await _http.SendAsync(request);
 
             if (res.IsSuccessStatusCode)
             {
-                try
-                {
-                    var resJson = await res.Content.ReadAsStringAsync();
-                    var msg = JsonConvert.DeserializeObject<DiscordMessage>(resJson);
-                    return msg;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Followup With Async Failed");
-                    return null;
-                }
+                return await GetResponseBody(res);
             }
             else return null;
         }
@@ -162,9 +181,38 @@ namespace DSharpPlus.SlashCommands
         /// <param name="token">Origial response token.</param>
         /// <param name="id">Id of the followup message that you want to edit.</param>
         /// <returns>Edit task</returns>
-        internal async Task EditAsync(InteractionResponse message, string token, ulong id)
+        internal async Task<DiscordMessage?> EditAsync(InteractionResponse edit, string token, ulong id)
         {
+            var request = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Patch,
+                RequestUri = GetEditFollowupUri(token, id),
+                Content = new StringContent(edit.BuildWebhookEditBody(_jsonSettings)),
+            };
+            request.Content.Headers.ContentType = new(_contentType);
 
+            var res = await _http.SendAsync(request);
+
+            if (res.IsSuccessStatusCode)
+            {
+                return await GetResponseBody(res);
+            }
+            else return null;
+        }
+
+        private async Task<DiscordMessage?> GetResponseBody(HttpResponseMessage res)
+        {
+            try
+            {
+                var resJson = await res.Content.ReadAsStringAsync();
+                var msg = JsonConvert.DeserializeObject<DiscordMessage>(resJson);
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Update Original Async Failed");
+                return null;
+            }
         }
 
         protected Uri GetEditOrDeleteInitalUri(string token)

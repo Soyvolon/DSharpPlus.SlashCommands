@@ -2,11 +2,11 @@
 
 namespace DSharpPlus.SlashCommands.Entities
 {
-    public class SlashCommandBase
+    public class BaseSlashCommandModule
     {
         protected readonly IServiceProvider _services;
 
-        public SlashCommandBase(IServiceProvider services)
+        public BaseSlashCommandModule(IServiceProvider services)
         {
             _services = services;
         }

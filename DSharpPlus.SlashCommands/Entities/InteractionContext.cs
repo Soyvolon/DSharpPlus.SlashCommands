@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,12 +32,12 @@ namespace DSharpPlus.SlashCommands.Entities
         /// <param name="tts">Is this message a text to speech message?</param>
         /// <param name="allowedMentions">The allowed mentions of the message</param>
         /// <returns>The response object form discord</returns>
-        public async Task ReplyAsync(string message = "", DiscordEmbed[]? embeds = null, bool? tts = null, IMention[]? allowedMentions = null, bool showSource = false)
+        public async Task<DiscordMessage> ReplyAsync(string message = "", DiscordEmbed[]? embeds = null, bool? tts = null, IMention[]? allowedMentions = null, bool showSource = false)
         {
             if (embeds is not null && embeds.Length > 10)
                 throw new Exception("Too many embeds");
 
-            await ReplyAsync(new InteractionResponse()
+            return await ReplyAsync(new InteractionResponse()
             {
                 Type = showSource ? InteractionResponseType.ChannelMessageWithSource : InteractionResponseType.ChannelMessage,
                 Data = new InteractionApplicationCommandCallbackData()
@@ -54,9 +55,14 @@ namespace DSharpPlus.SlashCommands.Entities
         /// </summary>
         /// <param name="response">An InteractionResponse object to send to the user.</param>
         /// <returns>The response object form discord</returns>
-        public async Task ReplyAsync(InteractionResponse response)
+        public async Task<DiscordMessage> ReplyAsync(InteractionResponse response)
         {
-            await _client.FollowupWithAsync(response, Interaction.Token);
+            var msg = await _client.FollowupWithAsync(response, Interaction.Token);
+
+            if (msg is null)
+                throw new Exception("Failed to reterive message object from Discord.");
+
+            return msg;
         }
         #endregion
         #region Edit
@@ -68,11 +74,25 @@ namespace DSharpPlus.SlashCommands.Entities
         /// <param name="toEdit">Message to edit by ID of the order it was sent. Defaults to the inital response</param>
         /// <param name="embeds">Embeds to send.</param>
         /// <param name="tts">Is this Text To Speech?</param>
-        /// <param name="AllowedMentions">Allowed mentions list</param>
+        /// <param name="allowedMentions">Allowed mentions list</param>
         /// <returns>The edited response</returns>
-        public async Task<InteractionResponse> EditResponseAsync(string message = "", int toEdit = 0, DiscordEmbed[]? embeds = null, bool? tts = null, IMention[]? AllowedMentions = null)
+        public async Task<DiscordMessage> EditResponseAsync(string message = "", ulong toEdit = 0, DiscordEmbed[]? embeds = null, bool? tts = null, IMention[]? allowedMentions = null)
         {
-            throw new NotImplementedException();
+            if (embeds is not null && embeds.Length > 10)
+                throw new Exception("Too many embeds");
+
+            return await EditResponseAsync(new InteractionResponse()
+            { 
+                Type = InteractionResponseType.ChannelMessage,
+                Data = new InteractionApplicationCommandCallbackData()
+                { 
+                    Content = message,
+                    Embeds = embeds,
+                    TextToSpeech = tts,
+                    AllowedMentions = allowedMentions
+                }
+            },
+            toEdit);
         }
 
         /// <summary>
@@ -81,9 +101,22 @@ namespace DSharpPlus.SlashCommands.Entities
         /// <param name="response">InteractionResponse to send to the user</param>
         /// <param name="toEdit">Message to edit by ID of the order it was sent. Defaults to the inital response</param>
         /// <returns>The edited response</returns>
-        public async Task<InteractionResponse> EditResponseAsync(InteractionResponse response, int toEdit = 0)
+        public async Task<DiscordMessage> EditResponseAsync(InteractionResponse response, ulong toEdit = 0)
         {
-            throw new NotImplementedException();
+            DiscordMessage? msg;
+            if(toEdit == 0)
+            {
+                msg = await _client.UpdateAsync(response, Interaction.Token);
+            }
+            else
+            {
+                msg = await _client.EditAsync(response, Interaction.Token, toEdit);
+            }
+
+            if (msg is null)
+                throw new Exception("Failed to edit the message");
+
+            return msg;
         }
         #endregion
         #region Delete
@@ -91,9 +124,14 @@ namespace DSharpPlus.SlashCommands.Entities
         /// Deletes the inital response for this interaction.
         /// </summary>
         /// <returns>The deleted interaction</returns>
-        public async Task<InteractionResponse> DeleteInitalAsync()
+        public async Task<DiscordMessage> DeleteInitalAsync()
         {
-            throw new NotImplementedException();
+            var msg = await _client.DeleteAsync(Interaction.Token);
+
+            if (msg is null)
+                throw new Exception("Failed to delete origial message");
+
+            return msg;
         }
         #endregion
     }
