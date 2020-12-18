@@ -18,24 +18,24 @@ namespace DSharpPlus.SlashCommands.Entities
         /// Builds the webhook body for sending a new message.
         /// </summary>
         /// <returns>Raw JSON body for a webhook POST operation.</returns>
-        public string BuildWebhookBody()
+        public string BuildWebhookBody(JsonSerializerSettings settings)
         {
             if (Data is null)
                 throw new Exception("Data can not be null.");
 
-            return JsonConvert.SerializeObject(Data); 
+            return JsonConvert.SerializeObject(Data, settings); 
         }
 
         /// <summary>
         /// Builds the webhook edit body for editing a previous message.
         /// </summary>
         /// <returns>Raw JSON body for a webhook PATCH operation.</returns>
-        public string BuildWebhookEditBody()
+        public string BuildWebhookEditBody(JsonSerializerSettings settings)
         {
             if (Data is null)
                 throw new Exception("Data can not be null.");
 
-            var d = JObject.Parse(JsonConvert.SerializeObject(Data));
+            var d = JObject.Parse(JsonConvert.SerializeObject(Data, settings));
 
             if (d.ContainsKey("tts"))
                 d.Remove("tts");
