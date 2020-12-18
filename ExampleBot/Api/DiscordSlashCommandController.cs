@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
 using DSharpPlus.SlashCommands.Entities.Builders;
 using DSharpPlus.SlashCommands.Enums;
-using DSharpPlus.SlashCommands.Services;
 
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -85,6 +81,7 @@ namespace ExampleBot.Api
             }
             // ... check to see if this is a ping to the webhook ...
             if (json.ContainsKey("type") && (int)json["type"] == (int)InteractionType.Ping)
+            {
                 return Ok(
                     JsonConvert.SerializeObject(
                         new InteractionResponseBuilder()
@@ -92,6 +89,7 @@ namespace ExampleBot.Api
                             .Build()
                         )
                     ); // ... and return the pong if it is.
+            }
             else
             {// ... then pass the raw request body to the client ...
                 var response = await Program.Slash.HandleWebhookPost(raw);
