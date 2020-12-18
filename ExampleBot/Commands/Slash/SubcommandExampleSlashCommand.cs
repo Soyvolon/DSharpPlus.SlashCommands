@@ -23,7 +23,7 @@ namespace ExampleBot.Commands.Slash
         [SlashSubcommand("command")]
         public async Task CommandAsync(InteractionContext ctx)
         {
-            await ctx.EditResponseAsync("This is a subcommand");
+            await ctx.ReplyAsync("This is a subcommand");
         }
     }
 }

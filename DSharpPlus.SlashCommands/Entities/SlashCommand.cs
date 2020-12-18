@@ -14,8 +14,7 @@ namespace DSharpPlus.SlashCommands.Entities
         public int Version { get; set; }
         public SlashSubcommand? Command { get; init; }
 
-        public Dictionary<string, SlashSubcommandGroup>? SubcommandGroups { get; init; }
-        public Dictionary<string, SlashSubcommand> Subcommands { get; set; }
+        public Dictionary<string, SlashSubcommandGroup>? Subcommands { get; init; }
 
         public SlashCommand(string name, int version, SlashSubcommand command, ulong? gid)
         {
@@ -32,11 +31,7 @@ namespace DSharpPlus.SlashCommands.Entities
             Name = name;
             Version = version;
             Description = desc;
-            SubcommandGroups = subcommands.ToDictionary(x => x.Name);
-            Subcommands = new();
-            foreach (var group in SubcommandGroups)
-                foreach (var c in group.Value.Commands)
-                    Subcommands[c.Key] = c.Value;
+            Subcommands = subcommands.ToDictionary(x => x.Name);
             GuildId = gid;
             Command = null;
         }
@@ -59,12 +54,25 @@ namespace DSharpPlus.SlashCommands.Entities
                 Command.ExecuteCommand(cArgs);
                 return true;
             }
-            else
+            else 
             {
-                if(Subcommands.TryGetValue(ctx.Interaction.Data?.Name ?? "", out var cmd))
+                if(Subcommands is null) return false;
+
+                var group = ctx.Interaction.Data?.Options?.FirstOrDefault();
+                if(group is not null)
                 {
-                    cmd.ExecuteCommand(cArgs);
-                    return true;
+                    if(Subcommands.TryGetValue(group.Name, out var cmdGroup))
+                    {
+                        var cmdData = group.Options?.FirstOrDefault();
+                        if(cmdData is not null)
+                        {
+                            if(cmdGroup.Commands.TryGetValue(cmdData.Name, out var cmd))
+                            {
+                                cmd.ExecuteCommand(cArgs);
+                                return true;
+                            }
+                        }
+                    }
                 }
             }
 

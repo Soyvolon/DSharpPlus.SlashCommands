@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.SlashCommands;
-
+using DSharpPlus.SlashCommands.Entities.Builders;
+using DSharpPlus.SlashCommands.Enums;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -53,11 +54,17 @@ namespace ExampleBot
             next.RegisterCommands(Assembly.GetExecutingAssembly());
             // ... connect to discord ...
             await Discord.ConnectAsync();
+
+            var defaultResponseData = new InteractionApplicationCommandCallbackDataBuilder()
+                .WithContent("`Test Automated Response`");
+
             // ... use the discord connection to build the Slash Client config ...
             Slash = new DiscordSlashClient(new DiscordSlashConfiguration
             {
                 ClientId = Discord.CurrentApplication.Id,
-                Token = jobj["token"].ToString()
+                Token = jobj["token"].ToString(),
+                DefaultResponseType = InteractionResponseType.ChannelMessageWithSource,
+                DefaultResponseData = defaultResponseData
             });
 
             Slash.RegisterCommands(Assembly.GetExecutingAssembly());

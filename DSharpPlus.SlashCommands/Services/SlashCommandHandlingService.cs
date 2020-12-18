@@ -185,15 +185,15 @@ namespace DSharpPlus.SlashCommands.Services
 
                             if(commands.TryGetValue(slashAttr.Name, out var slashCommand))
                             { //... and then make sure it has subcommands ...
-                                if (slashCommand.SubcommandGroups is null)
+                                if (slashCommand.Subcommands is null)
                                     throw new Exception("Can't add a subcommand to a Slash Command without subcommands.");
                                 // ... then get or add the subcommand for this command method ...
-                                if(!slashCommand.SubcommandGroups.ContainsKey(subGroupAttr.Name))
-                                    slashCommand.SubcommandGroups.Add(subGroupAttr.Name,
+                                if(!slashCommand.Subcommands.ContainsKey(subGroupAttr.Name))
+                                    slashCommand.Subcommands.Add(subGroupAttr.Name,
                                         new SlashSubcommandGroup(subGroupAttr.Name,
                                         subGroupClass.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "n/a"));
 
-                                if (slashCommand.SubcommandGroups.TryGetValue(subGroupAttr.Name, out var slashSubcommandGroup))
+                                if (slashCommand.Subcommands.TryGetValue(subGroupAttr.Name, out var slashSubcommandGroup))
                                 { //... and ensure the command does not already exsist ...
                                     if (slashSubcommandGroup.Commands.ContainsKey(attr.Name))
                                         throw new Exception("Can't have two subcommands of the same name!");
@@ -201,7 +201,7 @@ namespace DSharpPlus.SlashCommands.Services
                                     // ... then build an instance of the command ...
                                     // TODO: Actually make this dependency injection isntead of just passing the
                                     // services into the base slash command class.
-                                    var instance = Activator.CreateInstance(slashCmdClass, _services);
+                                    var instance = Activator.CreateInstance(subGroupClass, _services);
                                     // ... verify it was made correctly ...
                                     if (instance is null)
                                         throw new Exception("Failed to build command class instance");

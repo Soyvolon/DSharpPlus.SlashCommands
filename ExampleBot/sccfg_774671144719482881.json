@@ -1,14 +1,14 @@
 [
   {
-    "name": "hello",
-    "version": 1,
-    "guild_id": 750486424469372970,
-    "command_id": 789290437416189955
-  },
-  {
     "name": "sub",
     "version": 1,
     "guild_id": 750486424469372970,
     "command_id": 789511124517257287
+  },
+  {
+    "name": "hello",
+    "version": 1,
+    "guild_id": 750486424469372970,
+    "command_id": 789290437416189955
   }
 ]
