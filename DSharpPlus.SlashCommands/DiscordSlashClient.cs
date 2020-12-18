@@ -39,7 +39,7 @@ namespace DSharpPlus.SlashCommands
         /// Add an assembly to register commands from.
         /// </summary>
         /// <param name="assembly">Assembly to register</param>
-        public void WithAssembly(Assembly assembly)
+        public void RegisterCommands(Assembly assembly)
         {
             var slash = _services.GetRequiredService<SlashCommandHandlingService>();
             slash.WithCommandAssembly(assembly);

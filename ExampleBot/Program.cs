@@ -59,6 +59,9 @@ namespace ExampleBot
                 ClientId = Discord.CurrentApplication.Id,
                 Token = jobj["token"].ToString()
             });
+
+            Slash.RegisterCommand(Assembly.GetExecutingAssembly());
+
             // ... start the slash client ...
             await Slash.StartAsync();
             // ... build the web server for receiving HTTP POSTs from discord ...
