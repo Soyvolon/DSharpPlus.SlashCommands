@@ -3,6 +3,14 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <PackageId>Soyvolon.DSharpPlus.SlashCommands</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Soyvolon</Authors>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+
+    <Title>DSharpPlus based SlashCommnads</Title>
+    <Description>>A SlashCommnad library that uses DSharpPlus to encoperate SlashCommands for Discord</Description>
+    <RepositoryUrl>https://github.com/Soyvolon/DSharpPlus.SlashCommands</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,4 +22,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="LICENSE" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>  
 </Project>
