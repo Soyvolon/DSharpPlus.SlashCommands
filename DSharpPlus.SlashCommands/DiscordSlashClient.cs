@@ -222,7 +222,7 @@ namespace DSharpPlus.SlashCommands
 
         protected Uri GetPostFollowupUri(string token)
         {
-            return new Uri($"{api}/webhooks/{_config.ClientId}/{token}&wait={_config.WaitForConfirmation}");
+            return new Uri($"{api}/webhooks/{_config.ClientId}/{token}?wait={_config.WaitForConfirmation}");
         }
 
         protected Uri GetEditFollowupUri(string token, ulong messageId)
