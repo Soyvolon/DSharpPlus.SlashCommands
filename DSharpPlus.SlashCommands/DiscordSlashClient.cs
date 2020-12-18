@@ -80,6 +80,11 @@ namespace DSharpPlus.SlashCommands
             {// Attempt to get the Interact object from the JSON ...
                 var i = JsonConvert.DeserializeObject<Interaction>(requestBody);
                 // ... and tell the handler to run the command ...
+
+                var jobj = JObject.Parse(requestBody);
+                DiscordMember testM = jobj["member"].GetObject<DiscordMember>();
+                DiscordUser testU = jobj["member"]["user"].GetObject<DiscordUser>();
+
                 await _slash.HandleInteraction(i, this);
             }
             catch (Exception ex)

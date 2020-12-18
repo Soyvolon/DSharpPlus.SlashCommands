@@ -121,18 +121,7 @@ namespace DSharpPlus.SlashCommands.Services
             }
             finally
             {
-                if(RunningInteractions.TryRemove(interact, out var taskData))
-                {
-                    try
-                    {
-                        taskData.Item1.Dispose();
-                        taskData.Item2.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Interact task failed to dispose itself.");
-                    }
-                }
+                RunningInteractions.TryRemove(interact, out _);
             }
         }
 
