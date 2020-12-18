@@ -31,12 +31,6 @@ namespace ExampleBot.Api
             _logger = logger;
         }
 
-        private struct DiscordChallenge
-        {
-            [JsonProperty("type")]
-            public int type { get; set; }
-        }
-
         [HttpPost("")]
         //[ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> DiscordEndpointHandler()
