@@ -56,6 +56,7 @@ namespace DSharpPlus.SlashCommands.Services
 
             Commands = new();
             Assemblies = new();
+            RunningInteractions = new();
             Started = false;
         }
 

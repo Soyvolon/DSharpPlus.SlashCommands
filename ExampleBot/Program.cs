@@ -60,7 +60,7 @@ namespace ExampleBot
                 Token = jobj["token"].ToString()
             });
 
-            Slash.RegisterCommand(Assembly.GetExecutingAssembly());
+            Slash.RegisterCommands(Assembly.GetExecutingAssembly());
 
             // ... start the slash client ...
             await Slash.StartAsync();
