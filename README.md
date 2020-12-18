@@ -339,6 +339,13 @@ namespace ExampleBot.Api
     }
 }
 ```
+## Telling Discord to send you Interactions over webhooks
+In order for everything to work, Discord needs to know to send you information over Webhook and not the Gateway. This means you need at least a development version of the bot running on the server you intend to relase it to.
+
+Once the bot is running, and your API is ready to receive requests, head over to your discord developer portal and select your application. In the General Information tab, near the bottom there is an Interactions Endpoint URL field. Input your API endpoint there. For example, using the URL that was used earlier our endpoint would be: `https://slash.example.com/api/discordslash`
+
+Once you hit save, Discord is going to send a `POST` request to your URL (thus why it needs to be port-forwareded or on a server). This is where the Ping response comes in. Your app will recgonize the Ping, respond with Pong, and Discord will save your endpoint.
+
 > **Congrats, you now have SlashCommands setup!** <br />
 *Example code was from the ExampleBot project.*
 
