@@ -132,7 +132,7 @@ namespace DSharpPlus.SlashCommands
             var request = new HttpRequestMessage();
             request.Method = HttpMethod.Post;
             request.RequestUri = GetPostFollowupUri(token);
-            string json = JsonConvert.SerializeObject(followup, _jsonSettings);
+            string json = JsonConvert.SerializeObject(followup.BuildWebhookBody(), _jsonSettings);
             request.Content = new StringContent(json);
             request.Content.Headers.ContentType = new(_contentType);
 
