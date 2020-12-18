@@ -20,8 +20,16 @@ namespace DSharpPlus.SlashCommands
     {
         private const string api = "https://discord.com/api/v8";
         private readonly IServiceProvider _services;
+        private readonly SlashCommandHandlingService _slash;
         private readonly DiscordSlashConfiguration _config;
+        private readonly HttpClient _http;
         private readonly ILogger _logger;
+        private readonly JsonSerializerSettings _jsonSettings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore
+        };
+        private const string _contentType = "application/json";
 
         public DiscordSlashClient(DiscordSlashConfiguration config)
         {
@@ -32,6 +40,8 @@ namespace DSharpPlus.SlashCommands
 
             this._services = services.BuildServiceProvider();
             this._logger = this._services.GetRequiredService<ILogger<DiscordSlashClient>>();
+            this._slash = this._services.GetRequiredService<SlashCommandHandlingService>();
+            this._http = this._services.GetRequiredService<HttpClient>();
             this._config = config;
         }
 
@@ -41,8 +51,7 @@ namespace DSharpPlus.SlashCommands
         /// <param name="assembly">Assembly to register</param>
         public void RegisterCommands(Assembly assembly)
         {
-            var slash = _services.GetRequiredService<SlashCommandHandlingService>();
-            slash.WithCommandAssembly(assembly);
+            _slash.WithCommandAssembly(assembly);
         }
 
         /// <summary>
@@ -57,8 +66,7 @@ namespace DSharpPlus.SlashCommands
                 throw new Exception("Default response must be Acknowledge or ACKWithSource.");
 
             // Initalize the command handling service (and therefor updating command on discord).
-            var slash = _services.GetRequiredService<SlashCommandHandlingService>();
-            await slash.StartAsync(_config.Token, _config.ClientId);
+            await _slash.StartAsync(_config.Token, _config.ClientId);
         }
 
         /// <summary>
@@ -71,10 +79,8 @@ namespace DSharpPlus.SlashCommands
             try
             {// Attempt to get the Interact object from the JSON ...
                 var i = JsonConvert.DeserializeObject<Interaction>(requestBody);
-                // ... get the command handling service if it parses ...
-                var slash = _services.GetRequiredService<SlashCommandHandlingService>();
                 // ... and tell the handler to run the command ...
-                await slash.HandleInteraction(i);
+                await _slash.HandleInteraction(i, this);
             }
             catch (Exception ex)
             { // ... if it errors, log and return null.
@@ -94,7 +100,7 @@ namespace DSharpPlus.SlashCommands
         /// <returns>Update task</returns>
         internal async Task UpdateAsync(InteractionResponse iteraction)
         {
-
+            
         }
 
         /// <summary>
@@ -115,7 +121,18 @@ namespace DSharpPlus.SlashCommands
         /// <returns>Follwup task</returns>
         internal async Task FollowupWithAsync(InteractionResponse followup, string token)
         {
+            var request = new HttpRequestMessage();
+            request.Method = HttpMethod.Post;
+            request.RequestUri = GetPostFollowupUri(token);
+            request.Content = new StringContent(JsonConvert.SerializeObject(followup, _jsonSettings));
+            request.Content.Headers.ContentType = new(_contentType);
 
+            var res = await _http.SendAsync(request);
+
+            if(res.IsSuccessStatusCode)
+            {
+
+            }
         }
 
         /// <summary>

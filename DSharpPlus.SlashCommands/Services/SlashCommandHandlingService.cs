@@ -83,7 +83,7 @@ namespace DSharpPlus.SlashCommands.Services
             await VerifyCommandState();
         }
 
-        public Task HandleInteraction(Interaction interact)
+        public Task HandleInteraction(Interaction interact, DiscordSlashClient c)
         {
             // This should not get here, but check just in case.
             if (interact.Type == InteractionType.Ping) return Task.CompletedTask;
@@ -91,13 +91,13 @@ namespace DSharpPlus.SlashCommands.Services
             var cancelSource = new CancellationTokenSource();
             // Store the command task in a ConcurrentDictionary and continue with execution to not hodlup the webhook response.
             RunningInteractions[interact] = new(
-                Task.Run(async () => await ExecuteInteraction(interact, cancelSource.Token)),
+                Task.Run(async () => await ExecuteInteraction(interact, c, cancelSource.Token)),
                 cancelSource);
 
             return Task.CompletedTask;
         }
 
-        private async Task ExecuteInteraction(Interaction interact, CancellationToken cancellationToken)
+        private async Task ExecuteInteraction(Interaction interact, DiscordSlashClient c, CancellationToken cancellationToken)
         {
             try
             {
@@ -110,7 +110,9 @@ namespace DSharpPlus.SlashCommands.Services
                 { // TODO: Check how subcommands are returned.
                     // TODO: Do argument parsing.
 
-                    cmd.ExecuteCommand();
+                    var context = new InteractionContext(c, interact);
+
+                    cmd.ExecuteCommand(context);
                 }
             }
             catch (Exception ex)

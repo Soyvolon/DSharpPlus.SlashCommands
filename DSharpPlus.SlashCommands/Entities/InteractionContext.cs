@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using DSharpPlus.Entities;
+using DSharpPlus.SlashCommands.Enums;
 
 using Microsoft.AspNetCore.Http;
 
@@ -13,15 +14,13 @@ namespace DSharpPlus.SlashCommands.Entities
     public class InteractionContext
     {
         private readonly DiscordSlashClient _client;
-        private readonly HttpRequest request;
 
         public Interaction Interaction { get; internal set; }
 
-        public InteractionContext(DiscordSlashClient c, Interaction i, HttpRequest r)
+        public InteractionContext(DiscordSlashClient c, Interaction i)
         {
             _client = c;
             Interaction = i;
-            request = r;
         }
         #region Followup
         /// <summary>
@@ -30,11 +29,24 @@ namespace DSharpPlus.SlashCommands.Entities
         /// <param name="message">Text content to send back</param>
         /// <param name="embeds">Embeds to send back</param>
         /// <param name="tts">Is this message a text to speech message?</param>
-        /// <param name="AllowedMentions">The allowed mentions of the message</param>
+        /// <param name="allowedMentions">The allowed mentions of the message</param>
         /// <returns>The response object form discord</returns>
-        public async Task<InteractionResponse> ReplyAsync(string message = "", DiscordEmbed[]? embeds = null, bool? tts = null, IMention[]? AllowedMentions = null)
+        public async Task ReplyAsync(string message = "", DiscordEmbed[]? embeds = null, bool? tts = null, IMention[]? allowedMentions = null, bool showSource = false)
         {
-            throw new NotImplementedException();
+            if (embeds is not null && embeds.Length > 10)
+                throw new Exception("Too many embeds");
+
+            await ReplyAsync(new InteractionResponse()
+            {
+                Type = showSource ? InteractionResponseType.ChannelMessageWithSource : InteractionResponseType.ChannelMessage,
+                Data = new InteractionApplicationCommandCallbackData()
+                {
+                    Content = message,
+                    Embeds = embeds,
+                    TextToSpeech = tts,
+                    AllowedMentions = allowedMentions
+                }
+            });
         }
         
         /// <summary>
@@ -42,9 +54,9 @@ namespace DSharpPlus.SlashCommands.Entities
         /// </summary>
         /// <param name="response">An InteractionResponse object to send to the user.</param>
         /// <returns>The response object form discord</returns>
-        public async Task<InteractionResponse> ReplyAsync(InteractionResponse response)
+        public async Task ReplyAsync(InteractionResponse response)
         {
-            throw new NotImplementedException();
+            await _client.FollowupWithAsync(response, Interaction.Token);
         }
         #endregion
         #region Edit
