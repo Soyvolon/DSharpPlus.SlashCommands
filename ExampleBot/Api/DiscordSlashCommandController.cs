@@ -63,7 +63,7 @@ namespace ExampleBot.Api
                 }
             }
             catch (Exception ex)
-            { // ... if an error occoured, log the error and return at 401 Unauthorized.
+            { // ... if an error occurred, log the error and return at 401 Unauthorized.
                 _logger.LogInformation(ex, "Decryption failed.");
                 _logger.LogWarning("Failed to validate POST request for Discord API.");
                 return Unauthorized("Invalid Request Signature");
@@ -94,7 +94,7 @@ namespace ExampleBot.Api
             {// ... then pass the raw request body to the client ...
                 var response = await Program.Slash.HandleWebhookPost(raw);
                 if (response is not null) // ... if the clients response is not null ...
-                    return Ok(JsonConvert.SerializeObject(response)); // ... serialie it and send it.
+                    return Ok(JsonConvert.SerializeObject(response)); // ... serialize it and send it.
                 else return BadRequest("Failed to parse request JSON."); // ... or send a bad request message.
             }
         }

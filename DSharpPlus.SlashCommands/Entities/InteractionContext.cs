@@ -66,12 +66,12 @@ namespace DSharpPlus.SlashCommands.Entities
         }
         #endregion
         #region Edit
-        // Edit for both inital response and other responses.
+        // Edit for both initial response and other responses.
         /// <summary>
         /// Edits an already sent message.
         /// </summary>
         /// <param name="message">Text content to send</param>
-        /// <param name="toEdit">Message to edit by ID of the order it was sent. Defaults to the inital response</param>
+        /// <param name="toEdit">Message to edit by ID of the order it was sent. Defaults to the initial response</param>
         /// <param name="embeds">Embeds to send.</param>
         /// <param name="tts">Is this Text To Speech?</param>
         /// <param name="allowedMentions">Allowed mentions list</param>
@@ -99,7 +99,7 @@ namespace DSharpPlus.SlashCommands.Entities
         /// Edits an already sent message
         /// </summary>
         /// <param name="response">InteractionResponse to send to the user</param>
-        /// <param name="toEdit">Message to edit by ID of the order it was sent. Defaults to the inital response</param>
+        /// <param name="toEdit">Message to edit by ID of the order it was sent. Defaults to the initial response</param>
         /// <returns>The edited response</returns>
         public async Task<DiscordMessage> EditResponseAsync(InteractionResponse response, ulong toEdit = 0)
         {
@@ -121,7 +121,7 @@ namespace DSharpPlus.SlashCommands.Entities
         #endregion
         #region Delete
         /// <summary>
-        /// Deletes the inital response for this interaction.
+        /// Deletes the initial response for this interaction.
         /// </summary>
         /// <returns>The deleted interaction</returns>
         public async Task<DiscordMessage> DeleteInitalAsync()
@@ -129,7 +129,7 @@ namespace DSharpPlus.SlashCommands.Entities
             var msg = await _client.DeleteAsync(Interaction.Token);
 
             if (msg is null)
-                throw new Exception("Failed to delete origial message");
+                throw new Exception("Failed to delete original message");
 
             return msg;
         }
