@@ -126,8 +126,8 @@ namespace DSharpPlus.SlashCommands
         /// </summary>
         /// <param name="followup">New response to send.</param>
         /// <param name="token">Origianl response token.</param>
-        /// <returns>Follwup task</returns>
-        internal async Task FollowupWithAsync(InteractionResponse followup, string token)
+        /// <returns>The DiscordMessage that was created.</returns>
+        internal async Task<DiscordMessage?> FollowupWithAsync(InteractionResponse followup, string token)
         {
             var request = new HttpRequestMessage();
             request.Method = HttpMethod.Post;
@@ -138,10 +138,21 @@ namespace DSharpPlus.SlashCommands
 
             var res = await _http.SendAsync(request);
 
-            if(res.IsSuccessStatusCode)
+            if (res.IsSuccessStatusCode)
             {
-
+                try
+                {
+                    var resJson = await res.Content.ReadAsStringAsync();
+                    var msg = JsonConvert.DeserializeObject<DiscordMessage>(resJson);
+                    return msg;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Followup With Async Failed");
+                    return null;
+                }
             }
+            else return null;
         }
 
         /// <summary>
@@ -163,7 +174,7 @@ namespace DSharpPlus.SlashCommands
 
         protected Uri GetPostFollowupUri(string token)
         {
-            return new Uri($"{api}/webhooks/{_config.ClientId}/{token}");
+            return new Uri($"{api}/webhooks/{_config.ClientId}/{token}&wait={_config.WaitForConfirmation}");
         }
 
         protected Uri GetEditFollowupUri(string token, ulong messageId)
