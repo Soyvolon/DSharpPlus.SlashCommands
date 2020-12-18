@@ -185,15 +185,15 @@ namespace DSharpPlus.SlashCommands.Services
 
                             if(commands.TryGetValue(slashAttr.Name, out var slashCommand))
                             { //... and then make sure it has subcommands ...
-                                if (slashCommand.Subcommands is null)
+                                if (slashCommand.SubcommandGroups is null)
                                     throw new Exception("Can't add a subcommand to a Slash Command without subcommands.");
                                 // ... then get or add the subcommand for this command method ...
-                                if(!slashCommand.Subcommands.ContainsKey(subGroupAttr.Name))
-                                    slashCommand.Subcommands.Add(subGroupAttr.Name,
+                                if(!slashCommand.SubcommandGroups.ContainsKey(subGroupAttr.Name))
+                                    slashCommand.SubcommandGroups.Add(subGroupAttr.Name,
                                         new SlashSubcommandGroup(subGroupAttr.Name,
                                         subGroupClass.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "n/a"));
 
-                                if (slashCommand.Subcommands.TryGetValue(subGroupAttr.Name, out var slashSubcommandGroup))
+                                if (slashCommand.SubcommandGroups.TryGetValue(subGroupAttr.Name, out var slashSubcommandGroup))
                                 { //... and ensure the command does not already exsist ...
                                     if (slashSubcommandGroup.Commands.ContainsKey(attr.Name))
                                         throw new Exception("Can't have two subcommands of the same name!");
