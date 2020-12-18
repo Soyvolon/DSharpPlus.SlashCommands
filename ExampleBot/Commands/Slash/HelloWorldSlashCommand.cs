@@ -9,11 +9,20 @@ using DSharpPlus.SlashCommands.Entities;
 using DSharpPlus.SlashCommands.Entities.Builders;
 using DSharpPlus.SlashCommands.Enums;
 
+using Microsoft.Extensions.DependencyInjection;
+
+using static ExampleBot.Program;
+
 namespace ExampleBot.Commands.Slash
 {
     public class HelloWorldSlashCommand : BaseSlashCommandModule
     {
-        public HelloWorldSlashCommand(IServiceProvider proivder) : base(proivder) { }
+        TestService service;
+
+        public HelloWorldSlashCommand(IServiceProvider proivder) : base(proivder) 
+        {
+            service = proivder.GetService<TestService>();
+        }
 
         [SlashCommand("hello", 1, 750486424469372970)]
         public async Task HelloWorldSlashCommandAsync(InteractionContext ctx)

@@ -32,12 +32,18 @@ namespace DSharpPlus.SlashCommands
         };
         private const string _contentType = "application/json";
 
-        public DiscordSlashClient(DiscordSlashConfiguration config)
+        public DiscordSlashClient(DiscordSlashConfiguration config, IServiceCollection? collection = null)
         {
-            ServiceCollection services = new ServiceCollection();
+            IServiceCollection services = new ServiceCollection();
             services.AddSingleton<SlashCommandHandlingService>()
                 .AddSingleton<HttpClient>()
                 .AddLogging(o => o.AddConsole());
+
+            if(collection is not null)
+            {
+                foreach (var c in collection)
+                    services.Add(c);
+            }
 
             this._services = services.BuildServiceProvider();
             this._logger = this._services.GetRequiredService<ILogger<DiscordSlashClient>>();

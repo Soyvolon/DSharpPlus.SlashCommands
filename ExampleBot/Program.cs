@@ -12,6 +12,7 @@ using DSharpPlus.SlashCommands.Entities.Builders;
 using DSharpPlus.SlashCommands.Enums;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -27,6 +28,11 @@ namespace ExampleBot
         public static void Main(string[] args)
         {
             MainAsync(args).GetAwaiter().GetResult();
+        }
+
+        public class TestService
+        {
+            
         }
 
         public static async Task MainAsync(string[] args)
@@ -58,6 +64,9 @@ namespace ExampleBot
             var defaultResponseData = new InteractionApplicationCommandCallbackDataBuilder()
                 .WithContent("`Test Automated Response`");
 
+            IServiceCollection c = new ServiceCollection();
+            c.AddTransient<TestService>();
+
             // ... use the discord connection to build the Slash Client config ...
             Slash = new DiscordSlashClient(new DiscordSlashConfiguration
             {
@@ -65,7 +74,7 @@ namespace ExampleBot
                 Token = jobj["token"].ToString(),
                 DefaultResponseType = InteractionResponseType.ChannelMessageWithSource,
                 DefaultResponseData = defaultResponseData
-            });
+            }, c);
 
             Slash.RegisterCommands(Assembly.GetExecutingAssembly());
 
