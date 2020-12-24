@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
 using DSharpPlus.SlashCommands.Entities;
 using DSharpPlus.SlashCommands.Entities.Builders;
 using DSharpPlus.SlashCommands.Services;
@@ -79,6 +80,26 @@ namespace DSharpPlus.SlashCommands
             await _slash.StartAsync(_config.Token, _config.ClientId);
         }
 
+        public async Task<bool> HandleGatewayEvent(InteractionCreateEventArgs args)
+        {
+            await _slash.HandleInteraction(args.Interaction, this);
+
+            var data = GetDeafultResponse().Build();
+
+            var msg = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Post,
+                RequestUri = GetGatewayFollowupUri(args.Interaction.Id.ToString(), args.Interaction.Token),
+                Content = new StringContent(JsonConvert.SerializeObject(data))
+            };
+
+            msg.Content.Headers.ContentType = new(_contentType);
+
+            var res = await _http.SendAsync(msg);
+
+            return res.IsSuccessStatusCode;
+        }
+
         /// <summary>
         /// Handle an incoming webhook request and return the default data to send back to Discord.
         /// </summary>
@@ -88,15 +109,8 @@ namespace DSharpPlus.SlashCommands
         {
             try
             {// Attempt to get the Interact object from the JSON ...
-                var i = JsonConvert.DeserializeObject<Interaction>(requestBody);
+                var i = JsonConvert.DeserializeObject<DiscordInteraction>(requestBody);
                 // ... and tell the handler to run the command ...
-
-                var jobj = JObject.Parse(requestBody);
-                DiscordUser? user = jobj["member"]?["user"]?.ToObject<DiscordUser>();
-                // ... because we cant serialize direct to a DiscordMember, we are working around this
-                // and using a DiscordUser instead. I would have to set the Lib as upstream to this before I
-                // would be able to change this.
-                i.User = user;
 
                 await _slash.HandleInteraction(i, this);
             }
@@ -105,17 +119,23 @@ namespace DSharpPlus.SlashCommands
                 _logger.LogError(ex, "Webhook Handler failed.");
                 return null;
             }
-            // ... return the default interaction type.
+
+            return GetDeafultResponse().Build();
+        }
+
+        private InteractionResponseBuilder GetDeafultResponse()
+        {
+            // createa  new response object ....
             var response = new InteractionResponseBuilder()
                 .WithType(_config.DefaultResponseType);
-            
-            if(_config.DefaultResponseType != Enums.InteractionResponseType.Acknowledge
+            // ... add the optional configs ...
+            if (_config.DefaultResponseType != Enums.InteractionResponseType.Acknowledge
                 && _config.DefaultResponseType != Enums.InteractionResponseType.ACKWithSource)
-                {
-                    response.Data = _config.DefaultResponseData;
-                }
-
-            return response.Build();
+            {
+                response.Data = _config.DefaultResponseData;
+            }
+            // ... and return the builder object.
+            return response;
         }
 
         /// <summary>
@@ -251,6 +271,11 @@ namespace DSharpPlus.SlashCommands
         protected Uri GetEditFollowupUri(string token, ulong messageId)
         {
             return new Uri($"{api}/webhooks/{_config.ClientId}/{token}/messages/{messageId}");
+        }
+
+        protected Uri GetGatewayFollowupUri(string interactId, string token)
+        {
+            return new Uri($"{api}/interactions/{interactId}/{token}/callback");
         }
     }
 }
