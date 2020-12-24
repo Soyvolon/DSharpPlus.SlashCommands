@@ -9,6 +9,8 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
 using DSharpPlus.SlashCommands.Attributes;
 using DSharpPlus.SlashCommands.Entities;
 using DSharpPlus.SlashCommands.Entities.Builders;
@@ -38,7 +40,7 @@ namespace DSharpPlus.SlashCommands.Services
         private ConcurrentDictionary<string, SlashCommand> Commands { get; set; }
         private List<Assembly> Assemblies { get; set; }
 
-        private ConcurrentDictionary<Interaction, Tuple<Task, CancellationTokenSource>> RunningInteractions;
+        private ConcurrentDictionary<DiscordInteraction, Tuple<Task, CancellationTokenSource>> RunningInteractions;
 
 
         /// <summary>
