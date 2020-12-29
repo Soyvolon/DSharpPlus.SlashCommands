@@ -2,7 +2,7 @@
 A SlashCommand implementation for DSharpPlus. This does not connect to the gateway and gateway events or HTTP post events must be handled by the client.
 
 # Notices
-### Command parameters are not implemented, parse these yourself from the interaction context
+### While commands will be added to Discord, not all limit checks are done by this utility. Please make sure you are not violating them yourself by checking the limits [here](#command-limits).
 ### Standard DI is not implemented, the IServiceProvider is how you can get services as of right now
 ### You cant add services to the IServiceProvider at the moment, but it does have a logger for logging.
 
@@ -17,7 +17,7 @@ As this lib currently only supports Webhook interaction, make sure to create an 
 ## Create the `DiscordSlashClient`
 A Discord Slash Client requires two things:
 1. A Bot token for verification with Discord
-2. An application ID for sending requests to Discord.
+2. An active Discord Client. Use `Client =` for a `DiscordClient` and `DiscordRestClient`, and `ShardedClient =` for a `DiscordShardedClient`.
 
 The Token and Application ID need to be from the same application.
 
@@ -25,7 +25,15 @@ First, create a new DiscordSlashConfiguration:
 ```csharp
 var config = new DiscordSlashConfiguration
 {
-    ClientId = <bot client ID>,
+    Client = <Discord Client or Discord Rest Client>,
+    Token = <bot token>
+}
+```
+Or by using a ShardedClient instead:
+```csharp
+var config = new DiscordSlashConfiguration
+{
+    ShardedClient = <Discord Sharded Client>,
     Token = <bot token>
 }
 ```
@@ -419,3 +427,22 @@ A few things to note:
 - If you have a subcommand, you can not have a default command.
 - There is a max of 10 subcommand groups per command
 - There is a max of 10 subcommands per subcommand group.
+
+## Command Limits
+Some rules to keep in mind for adding parameters:
+
+*From the [Discord Docs](https://discord.com/developers/docs/interactions/slash-commands#a-quick-note-on-limits)*
+- An app can have up to 50 top-level global commands (50 commands with unique names)
+- An app can have up to an additional 50 guild commands per guild
+- An app can have up to 10 subcommand groups on a top-level command
+- An app can have up to 10 subcommands within a subcommand group
+- `choices` can have up to 10 values per option
+- commands can have up to 10 options per command
+- Limitations on [command names](https://discord.com/developers/docs/interactions/slash-commands#registering-a-command)
+- Limitations on [nesting subcommands and groups](https://discord.com/developers/docs/interactions/slash-commands#nested-subcommands-and-groups)
+### Using Enums as Parameters for Commands
+You can use an `enum` as a parameter for a command. However, due to the limits Discord sets, you can only have up to ten values for your `enum`.
+
+> An enum is automatically assigned the `choices` type in the Discord Slash command.
+
+To set a description for your `enum` value, use the `System.ComponentModel.DescriptionAttribute` over the `DSharpPlus` version, as the `DSharpPlus` description attribute does not work on `enum` values.
