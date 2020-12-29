@@ -44,8 +44,14 @@ namespace ExampleBot.Commands.Slash
                 .WithType(InteractionResponseType.ChannelMessage)
                 .WithData(new InteractionApplicationCommandCallbackDataBuilder()
                     .WithEmbed(new DiscordEmbedBuilder()
-                        .WithTitle("Hello World!")
-                        .WithDescription($"And hello to you too, {ctx.Interaction.User.Username}"))
+                        .WithTitle("Testing Arguments!")
+                        .WithDescription($"Choice: {choice}\n" +
+                        $"Age: {age}\n" +
+                        $"Name: {name}\n" +
+                        $"Female? {female}\n" +
+                        $"User: {user.Username}\n" +
+                        $"Channel: {channel.Name}\n" +
+                        $"Role: {role.Name}"))
                     .WithContent("How's Life?"));
 
             await ctx.ReplyAsync(response.Build());
