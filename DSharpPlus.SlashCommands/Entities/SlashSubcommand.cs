@@ -95,44 +95,76 @@ namespace DSharpPlus.SlashCommands.Entities
 
         private static async Task<DiscordUser?> ParseUser(object arg, BaseDiscordClient client)
         {
-            switch(client)
+            try
             {
-                case DiscordClient discord:
-                    return await discord.GetUserAsync((ulong)arg);
-                case DiscordRestClient rest:
-                    return await rest.GetUserAsync((ulong)arg);
-            }
+                ulong argVal = Convert.ToUInt64(arg);
 
-            return null;
+                switch (client)
+                {
+                    case DiscordClient discord:
+                        return await discord.GetUserAsync(argVal);
+                    case DiscordRestClient rest:
+                        return await rest.GetUserAsync(argVal);
+                }
+
+                return null;
+            }
+            catch
+            {
+                // TODO: Logger here.
+
+                return null;
+            }
         }
 
         private static async Task<DiscordChannel?> ParseChannel(object arg, BaseDiscordClient client)
         {
-            switch (client)
+            try
             {
-                case DiscordClient discord:
-                    return await discord.GetChannelAsync((ulong)arg);
-                case DiscordRestClient rest:
-                    return await rest.GetChannelAsync((ulong)arg);
-            }
+                ulong argVal = Convert.ToUInt64(arg);
 
-            return null;
+                switch (client)
+                {
+                    case DiscordClient discord:
+                        return await discord.GetChannelAsync(argVal);
+                    case DiscordRestClient rest:
+                        return await rest.GetChannelAsync(argVal);
+                }
+
+                return null;
+            }
+            catch
+            {
+                // TODO: Logger here.
+
+                return null;
+            }
         }
 
         private static async Task<DiscordRole?> ParseRole(object arg, BaseDiscordClient client, ulong guildId)
         {
-            switch (client)
+            try
             {
-                case DiscordClient discord:
-                    var guild = await discord.GetGuildAsync(guildId);
-                    return guild.GetRole((ulong)arg);
-                case DiscordRestClient rest:
-                    var roles = await rest.GetGuildRolesAsync(guildId);
-                    ulong argId = (ulong)arg;
-                    return roles.FirstOrDefault(x => x.Id == argId);
-            }
+                ulong argVal = Convert.ToUInt64(arg);
 
-            return null;
+                switch (client)
+                {
+                    case DiscordClient discord:
+                        var guild = await discord.GetGuildAsync(guildId);
+                        return guild.GetRole(argVal);
+                    case DiscordRestClient rest:
+                        var roles = await rest.GetGuildRolesAsync(guildId);
+                        return roles.FirstOrDefault(x => x.Id == argVal);
+                }
+
+                return null;
+            }
+            catch
+            {
+                // TODO: Logger here
+
+                return null;
+            }
         }
     }
 }
