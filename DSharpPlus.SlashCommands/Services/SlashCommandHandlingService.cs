@@ -83,7 +83,7 @@ namespace DSharpPlus.SlashCommands.Services
             await VerifyCommandState();
         }
 
-        public Task HandleInteraction(Interaction interact, DiscordSlashClient c)
+        public Task HandleInteraction(BaseDiscordClient discord, Interaction interact, DiscordSlashClient c)
         {
             // This should not get here, but check just in case.
             if (interact.Type == InteractionType.Ping) return Task.CompletedTask;
@@ -91,18 +91,18 @@ namespace DSharpPlus.SlashCommands.Services
             var cancelSource = new CancellationTokenSource();
             // Store the command task in a ConcurrentDictionary and continue with execution to not hodlup the webhook response.
             RunningInteractions[interact] = new(
-                Task.Run(async () => await ExecuteInteraction(interact, c, cancelSource.Token)),
+                Task.Run(async () => await ExecuteInteraction(discord, interact, c, cancelSource.Token)),
                 cancelSource);
 
             return Task.CompletedTask;
         }
 
-        private async Task ExecuteInteraction(Interaction interact, DiscordSlashClient c, CancellationToken cancellationToken)
+        private async Task ExecuteInteraction(BaseDiscordClient discord, Interaction interact, DiscordSlashClient c, CancellationToken cancellationToken)
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-
+                
                 if (interact.Data is null)
                     throw new Exception("Interact object has no command data.");
 
@@ -116,11 +116,11 @@ namespace DSharpPlus.SlashCommands.Services
                     {
                         var args = await GetRawArguments(interact.Data.Options);
 
-                        cmd.ExecuteCommand(context, args);
+                        cmd.ExecuteCommand(discord, context, args);
                     }
                     else
                     {
-                        cmd.ExecuteCommand(context);
+                        cmd.ExecuteCommand(discord, context);
                     }
                 }
             }

@@ -11,9 +11,13 @@ namespace DSharpPlus.SlashCommands
         /// </summary>
         public string Token { get; set; }
         /// <summary>
-        /// The Client ID of your application
+        /// Base client used for parsing DSharpPlus arguments. Can be a Rest or Regular client. This or a ShardedClient is required.
         /// </summary>
-        public ulong ClientId { get; set; }
+        public BaseDiscordClient? Client { get; set; }
+        /// <summary>
+        /// Base sharded client used for parsing DSharpPLus arguments. This or a Rest or Regular client is required.
+        /// </summary>
+        public DiscordShardedClient? ShardedClient { get; set; }
         /// <summary>
         /// The Default Response type that is sent to Discord upon receiving a request.
         /// </summary>

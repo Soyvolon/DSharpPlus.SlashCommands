@@ -70,7 +70,7 @@ namespace ExampleBot
             // ... use the discord connection to build the Slash Client config ...
             Slash = new DiscordSlashClient(new DiscordSlashConfiguration
             {
-                ClientId = Discord.CurrentApplication.Id,
+                Client = Discord,
                 Token = jobj["token"].ToString(),
                 DefaultResponseType = InteractionResponseType.ChannelMessageWithSource,
                 DefaultResponseData = defaultResponseData

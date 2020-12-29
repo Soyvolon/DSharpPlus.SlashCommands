@@ -20,9 +20,24 @@ namespace DSharpPlus.SlashCommands
     public class DiscordSlashClient
     {
         private const string api = "https://discord.com/api/v8";
+
+        private ulong ApplicationId
+        {
+            get
+            {
+                if (this._discord is not null)
+                    return this._discord.CurrentApplication.Id;
+                else if (this._sharded is not null)
+                    return this._sharded.CurrentApplication.Id;
+                else return 0;
+            }
+        }
+
         private readonly IServiceProvider _services;
         private readonly SlashCommandHandlingService _slash;
         private readonly DiscordSlashConfiguration _config;
+        private readonly BaseDiscordClient? _discord;
+        private readonly DiscordShardedClient? _sharded;
         private readonly HttpClient _http;
         private readonly ILogger _logger;
         private readonly JsonSerializerSettings _jsonSettings = new JsonSerializerSettings
@@ -51,6 +66,11 @@ namespace DSharpPlus.SlashCommands
             this._config = config;
             this._http = this._services.GetRequiredService<HttpClient>();
             this._http.DefaultRequestHeaders.Authorization = new("Bot", this._config.Token);
+            this._discord = this._config.Client;
+            this._sharded = this._config.ShardedClient;
+
+            if (this._discord is null && this._sharded is null)
+                throw new Exception("A Discord Client or Sharded Client is required.");
         }
 
         /// <summary>
@@ -76,7 +96,7 @@ namespace DSharpPlus.SlashCommands
                 
 
             // Initialize the command handling service (and therefor updating command on discord).
-            await _slash.StartAsync(_config.Token, _config.ClientId);
+            await _slash.StartAsync(_config.Token, ApplicationId);
         }
 
         /// <summary>
@@ -98,7 +118,20 @@ namespace DSharpPlus.SlashCommands
                 // would be able to change this.
                 i.User = user;
 
-                await _slash.HandleInteraction(i, this);
+                BaseDiscordClient? client = null;
+                if (_discord is not null)
+                    client = _discord;
+                else if(_sharded is not null)
+                {
+                    foreach(var shard in _sharded.ShardClients)
+                        if (shard.Value.Guilds.ContainsKey(i.GuildId))
+                            client = shard.Value;
+                }
+
+                if (client is null)
+                    throw new Exception("Failed to get a proper cleint for this request.");
+
+                await _slash.HandleInteraction(client, i, this);
             }
             catch (Exception ex)
             { // ... if it errors, log and return null.
@@ -240,17 +273,17 @@ namespace DSharpPlus.SlashCommands
 
         protected Uri GetEditOrDeleteInitialUri(string token)
         {
-            return new Uri($"{api}/webhooks/{_config.ClientId}/{token}/messages/@original");
+            return new Uri($"{api}/webhooks/{ApplicationId}/{token}/messages/@original");
         }
 
         protected Uri GetPostFollowupUri(string token)
         {
-            return new Uri($"{api}/webhooks/{_config.ClientId}/{token}?wait={_config.WaitForConfirmation}");
+            return new Uri($"{api}/webhooks/{ApplicationId}/{token}?wait={_config.WaitForConfirmation}");
         }
 
         protected Uri GetEditFollowupUri(string token, ulong messageId)
         {
-            return new Uri($"{api}/webhooks/{_config.ClientId}/{token}/messages/{messageId}");
+            return new Uri($"{api}/webhooks/{ApplicationId}/{token}/messages/{messageId}");
         }
     }
 }

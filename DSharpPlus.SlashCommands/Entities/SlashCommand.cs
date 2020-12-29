@@ -41,7 +41,7 @@ namespace DSharpPlus.SlashCommands.Entities
         /// </summary>
         /// <param name="args">Command arguments</param>
         /// <returns>True if the command was attempted, false if there was no command to attempt.</returns>
-        public bool ExecuteCommand(InteractionContext ctx, params object[] args)
+        public bool ExecuteCommand(BaseDiscordClient c, InteractionContext ctx, params object[] args)
         {
             List<object> combinedArgs = new List<object>();
             combinedArgs.Add(ctx);
@@ -51,7 +51,7 @@ namespace DSharpPlus.SlashCommands.Entities
 
             if (Command is not null)
             {
-                Command.ExecuteCommand(cArgs);
+                Command.ExecuteCommand(c, ctx.Interaction.GuildId, cArgs);
                 return true;
             }
             else 
@@ -68,7 +68,7 @@ namespace DSharpPlus.SlashCommands.Entities
                         {
                             if(cmdGroup.Commands.TryGetValue(cmdData.Name, out var cmd))
                             {
-                                cmd.ExecuteCommand(cArgs);
+                                cmd.ExecuteCommand(c, ctx.Interaction.GuildId, cArgs);
                                 return true;
                             }
                         }
