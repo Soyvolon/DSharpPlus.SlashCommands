@@ -56,13 +56,15 @@ namespace DSharpPlus.SlashCommands.Entities
 
         private object? ParseEnum(object arg, ParameterInfo info)
         {
-            if (int.TryParse(arg as string, out var i))
+            try
             {
-                var e = Enum.ToObject(info.ParameterType, i);
+                var e = Enum.ToObject(info.ParameterType, arg);
                 return e;
             }
-
-            return null;
+            catch
+            {
+                return null;
+            }
         }
     }
 }

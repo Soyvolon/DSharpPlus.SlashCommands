@@ -112,7 +112,16 @@ namespace DSharpPlus.SlashCommands.Services
 
                     var context = new InteractionContext(c, interact);
 
-                    cmd.ExecuteCommand(context);
+                    if(interact.Data.Options is not null)
+                    {
+                        var args = await GetRawArguments(interact.Data.Options);
+
+                        cmd.ExecuteCommand(context, args);
+                    }
+                    else
+                    {
+                        cmd.ExecuteCommand(context);
+                    }
                 }
             }
             catch (Exception ex)
@@ -122,6 +131,28 @@ namespace DSharpPlus.SlashCommands.Services
             finally
             {
                 RunningInteractions.TryRemove(interact, out _);
+            }
+        }
+
+        private async Task<object[]> GetRawArguments(ApplicationCommandInteractionDataOption[] options)
+        {
+            if(options[0].Options is not null)
+            {
+                return await GetRawArguments(options[0].Options);
+            }
+            else
+            {
+                var args = new List<object>();
+
+                foreach(var val in options)
+                {
+                    if(val.Value is null)
+                        throw new Exception("Value should not be null for a command parameter");
+
+                    args.Add(val.Value);
+                }
+
+                return args.ToArray();
             }
         }
 
@@ -527,6 +558,8 @@ namespace DSharpPlus.SlashCommands.Services
                     // ... and add the type.
                     b.WithType(type.Value);
                 }
+                // ... then store it for the return value.
+                builders.Add(b);
             }
             // ... then return the builders list.
             return builders;

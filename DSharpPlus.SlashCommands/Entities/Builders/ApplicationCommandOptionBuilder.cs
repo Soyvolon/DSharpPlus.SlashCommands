@@ -88,10 +88,8 @@ namespace DSharpPlus.SlashCommands.Entities.Builders
                 var part = new ApplicationCommandOptionChoiceBuilder()
                     .WithName(names[i]);
                 var val = values.GetValue(i);
-                if (val is int)
-                    part.WithValue((int)val);
-                if (val is string)
-                    part.WithValue((string)val);
+                
+                part.WithValue((int)val!);
 
                 choices.Add(part);
             }
