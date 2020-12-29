@@ -1,8 +1,7 @@
 name: Publish to Nuget
 
 on:
-  release:
-    types: [released]
+  workflow_dispatch:
 
 jobs:
   build:
