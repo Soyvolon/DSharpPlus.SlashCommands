@@ -53,7 +53,7 @@ namespace DSharpPlus.SlashCommands.Entities
 
                     parsedArgs[i] = e;
                 }
-                else if(param.ParameterType == typeof(DiscordUser))
+                else if (param.ParameterType == typeof(DiscordUser))
                 {
                     var u = await ParseUser(args[i], c);
 
@@ -62,7 +62,7 @@ namespace DSharpPlus.SlashCommands.Entities
 
                     parsedArgs[i] = u;
                 }
-                else if(param.ParameterType == typeof(DiscordChannel))
+                else if (param.ParameterType == typeof(DiscordChannel))
                 {
                     var chan = await ParseChannel(args[i], c);
 
@@ -71,7 +71,7 @@ namespace DSharpPlus.SlashCommands.Entities
 
                     parsedArgs[i] = chan;
                 }
-                else if(param.ParameterType == typeof(DiscordRole))
+                else if (param.ParameterType == typeof(DiscordRole))
                 {
                     var r = await ParseRole(args[i], c, guildId);
 
@@ -81,7 +81,18 @@ namespace DSharpPlus.SlashCommands.Entities
                     parsedArgs[i] = r;
                 }
                 else
-                    parsedArgs[i] = args[i];
+                {
+                    try
+                    {
+                        object parsed = Convert.ChangeType(args[i], param.ParameterType);
+                        parsedArgs[i] = parsed;
+                    }
+                    catch(Exception ex)
+                    {
+                        // TODO: Log this
+                        // Failed basic conversion.
+                    }
+                }
             }
 
             return parsedArgs;
