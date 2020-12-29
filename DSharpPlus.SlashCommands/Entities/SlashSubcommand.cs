@@ -24,8 +24,15 @@ namespace DSharpPlus.SlashCommands.Entities
 
         public async Task ExecuteCommand(BaseDiscordClient c, ulong guildId, params object[] args)
         {
-            var parsedArgs = await ParseArguments(c, guildId, args);
-            ExecutionMethod.Invoke(BaseCommand, parsedArgs);
+            try
+            {
+                var parsedArgs = await ParseArguments(c, guildId, args);
+                ExecutionMethod.Invoke(BaseCommand, parsedArgs);
+            }
+            catch (Exception ex)
+            {
+                // TODO Loger here
+            }
         }
 
         private async Task<object[]> ParseArguments(BaseDiscordClient c, ulong guildId, object[] args)
