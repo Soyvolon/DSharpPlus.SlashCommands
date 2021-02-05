@@ -317,5 +317,10 @@ namespace DSharpPlus.SlashCommands
         {
             return new Uri($"{api}/interactions/{interactId}/{token}/callback");
         }
+
+        protected Uri GetGatewayFollowupUri(string interactId, string token)
+        {
+            return new Uri($"{api}/interactions/{interactId}/{token}/callback");
+        }
     }
 }
