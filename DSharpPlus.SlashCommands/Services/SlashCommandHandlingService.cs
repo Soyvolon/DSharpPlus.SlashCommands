@@ -148,8 +148,8 @@ namespace DSharpPlus.SlashCommands.Services
 
                 foreach(var val in options)
                 {
-                    if(val.Value is null)
-                        throw new Exception("Value should not be null for a command parameter");
+                    if (val.Value is null)
+                        continue;
 
                     args.Add(val.Value);
                 }
