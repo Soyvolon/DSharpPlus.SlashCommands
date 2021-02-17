@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\DSharpPlusInteractionEvents\DSharpPlus.CommandsNext\DSharpPlus.CommandsNext.csproj" />
+    <ProjectReference Include="..\..\DSharpPlusInteractionEvents\DSharpPlus.Rest\DSharpPlus.Rest.csproj" />
     <ProjectReference Include="..\..\DSharpPlusInteractionEvents\DSharpPlus\DSharpPlus.csproj" />
   </ItemGroup>  
 </Project>

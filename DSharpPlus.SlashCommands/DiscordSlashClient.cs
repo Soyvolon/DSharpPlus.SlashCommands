@@ -102,7 +102,9 @@ namespace DSharpPlus.SlashCommands
 
         public async Task<bool> HandleGatewayEvent(InteractionCreateEventArgs args)
         {
-            await _slash.HandleInteraction(args.Interaction, this);
+            var client = GetBaseClientForRequest(args.Interaction.GuildId);
+
+            await _slash.HandleInteraction(client, args.Interaction, this);
 
             var data = GetDeafultResponse().Build();
 
@@ -132,25 +134,14 @@ namespace DSharpPlus.SlashCommands
                 var i = JsonConvert.DeserializeObject<DiscordInteraction>(requestBody);
                 // ... and tell the handler to run the command ...
 
-                var jobj = JObject.Parse(requestBody);
-                DiscordUser? user = jobj["member"]?["user"]?.ToObject<DiscordUser>();
-                // ... because we cant serialize direct to a DiscordMember, we are working around this
-                // and using a DiscordUser instead. I would have to set the Lib as upstream to this before I
-                // would be able to change this.
-                i.User = user;
+                //var jobj = JObject.Parse(requestBody);
+                //DiscordUser? user = jobj["member"]?["user"]?.ToObject<DiscordUser>();
+                //// ... because we cant serialize direct to a DiscordMember, we are working around this
+                //// and using a DiscordUser instead. I would have to set the Lib as upstream to this before I
+                //// would be able to change this.
+                //i.User = user;
 
-                BaseDiscordClient? client = null;
-                if (_discord is not null)
-                    client = _discord;
-                else if(_sharded is not null)
-                {
-                    foreach(var shard in _sharded.ShardClients)
-                        if (shard.Value.Guilds.ContainsKey(i.GuildId))
-                            client = shard.Value;
-                }
-
-                if (client is null)
-                    throw new Exception("Failed to get a proper cleint for this request.");
+                var client = GetBaseClientForRequest(i.GuildId);
 
                 await _slash.HandleInteraction(client, i, this);
             }
@@ -161,6 +152,24 @@ namespace DSharpPlus.SlashCommands
             }
 
             return GetDeafultResponse().Build();
+        }
+
+        private BaseDiscordClient GetBaseClientForRequest(ulong guildId = 0)
+        {
+            BaseDiscordClient? client = null;
+            if (_discord is not null)
+                client = _discord;
+            else if (_sharded is not null)
+            {
+                foreach (var shard in _sharded.ShardClients)
+                    if (shard.Value.Guilds.ContainsKey(guildId))
+                        client = shard.Value;
+            }
+
+            if (client is null)
+                throw new Exception("Failed to get a proper cleint for this request.");
+
+            return client;
         }
 
         private InteractionResponseBuilder GetDeafultResponse()
@@ -311,11 +320,6 @@ namespace DSharpPlus.SlashCommands
         protected Uri GetEditFollowupUri(string token, ulong messageId)
         {
             return new Uri($"{api}/webhooks/{ApplicationId}/{token}/messages/{messageId}");
-        }
-
-        protected Uri GetGatewayFollowupUri(string interactId, string token)
-        {
-            return new Uri($"{api}/interactions/{interactId}/{token}/callback");
         }
 
         protected Uri GetGatewayFollowupUri(string interactId, string token)

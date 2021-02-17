@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSharpPlus", "..\DSharpPlus
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSharpPlus.CommandsNext", "..\DSharpPlusInteractionEvents\DSharpPlus.CommandsNext\DSharpPlus.CommandsNext.csproj", "{D641E9EF-6525-4EAF-A35C-0F02DBA2E981}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSharpPlus.Rest", "..\DSharpPlusInteractionEvents\DSharpPlus.Rest\DSharpPlus.Rest.csproj", "{DB96E701-9DD4-4648-9899-A162E091EFA3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{D641E9EF-6525-4EAF-A35C-0F02DBA2E981}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D641E9EF-6525-4EAF-A35C-0F02DBA2E981}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D641E9EF-6525-4EAF-A35C-0F02DBA2E981}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB96E701-9DD4-4648-9899-A162E091EFA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB96E701-9DD4-4648-9899-A162E091EFA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB96E701-9DD4-4648-9899-A162E091EFA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB96E701-9DD4-4648-9899-A162E091EFA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -15,8 +15,8 @@ using DSharpPlus.SlashCommands.Attributes;
 using DSharpPlus.SlashCommands.Entities;
 using DSharpPlus.SlashCommands.Entities.Builders;
 using DSharpPlus.SlashCommands.Enums;
-
 using Microsoft.Extensions.Logging;
+using DSharpPlus;
 
 using Newtonsoft.Json;
 
@@ -85,7 +85,7 @@ namespace DSharpPlus.SlashCommands.Services
             await VerifyCommandState();
         }
 
-        public Task HandleInteraction(BaseDiscordClient discord, Interaction interact, DiscordSlashClient c)
+        public Task HandleInteraction(BaseDiscordClient discord, DiscordInteraction interact, DiscordSlashClient c)
         {
             // This should not get here, but check just in case.
             if (interact.Type == InteractionType.Ping) return Task.CompletedTask;
@@ -99,7 +99,7 @@ namespace DSharpPlus.SlashCommands.Services
             return Task.CompletedTask;
         }
 
-        private async Task ExecuteInteraction(BaseDiscordClient discord, Interaction interact, DiscordSlashClient c, CancellationToken cancellationToken)
+        private async Task ExecuteInteraction(BaseDiscordClient discord, DiscordInteraction interact, DiscordSlashClient c, CancellationToken cancellationToken)
         {
             try
             {
@@ -136,11 +136,11 @@ namespace DSharpPlus.SlashCommands.Services
             }
         }
 
-        private async Task<object[]> GetRawArguments(ApplicationCommandInteractionDataOption[] options)
+        private async Task<object[]> GetRawArguments(IEnumerable<DiscordInteractionDataOption> options)
         {
-            if(options[0].Options is not null)
+            if(options.FirstOrDefault()?.Options is not null)
             {
-                return await GetRawArguments(options[0].Options);
+                return await GetRawArguments(options.First().Options);
             }
             else
             {
@@ -148,10 +148,10 @@ namespace DSharpPlus.SlashCommands.Services
 
                 foreach(var val in options)
                 {
-                    if (val.Value is null)
+                    if (val.OptionType is null)
                         continue;
 
-                    args.Add(val.Value);
+                    args.Add(val.OptionType);
                 }
 
                 return args.ToArray();
