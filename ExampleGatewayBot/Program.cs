@@ -10,6 +10,7 @@ using DSharpPlus.SlashCommands.Entities.Builders;
 using DSharpPlus.SlashCommands.Enums;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json.Linq;
 
@@ -46,6 +47,9 @@ namespace ExampleGatewayBot
             next.RegisterCommands(Assembly.GetExecutingAssembly());
             // ... register the interaction event ...
             Discord.InteractionCreated += Discord_InteractionCreated;
+            Discord.ApplicationCommandCreated += Discord_ApplicationCommandCreated;
+            Discord.ApplicationCommandDeleted += Discord_ApplicationCommandDeleted;
+            Discord.ApplicationCommandUpdated += Discord_ApplicationCommandUpdated;
 
             // ... connect to discord ...
             Discord.ConnectAsync().GetAwaiter().GetResult();
@@ -71,6 +75,21 @@ namespace ExampleGatewayBot
             Task.Delay(-1).GetAwaiter().GetResult();
         }
 
+        private static Task Discord_ApplicationCommandUpdated(DiscordClient sender, DSharpPlus.EventArgs.ApplicationCommandEventArgs e)
+        {
+            Discord.Logger.LogInformation($"Shard {sender.ShardId} sent application command updated: {e.Command.Name}: {e.Command.Id} for {e.Command.ApplicationId}");
+            return Task.CompletedTask;
+        }
+        private static Task Discord_ApplicationCommandDeleted(DiscordClient sender, DSharpPlus.EventArgs.ApplicationCommandEventArgs e)
+        {
+            Discord.Logger.LogInformation($"Shard {sender.ShardId} sent application command deleted: {e.Command.Name}: {e.Command.Id} for {e.Command.ApplicationId}");
+            return Task.CompletedTask;
+        }
+        private static Task Discord_ApplicationCommandCreated(DiscordClient sender, DSharpPlus.EventArgs.ApplicationCommandEventArgs e)
+        {
+            Discord.Logger.LogInformation($"Shard {sender.ShardId} sent application command created: {e.Command.Name}: {e.Command.Id} for {e.Command.ApplicationId}");
+            return Task.CompletedTask;
+        }
         private static async Task Discord_InteractionCreated(DiscordClient sender, DSharpPlus.EventArgs.InteractionCreateEventArgs e)
             => await Slash.HandleGatewayEvent(e);
     }
