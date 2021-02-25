@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using DSharpPlus.Entities;
+
 namespace DSharpPlus.SlashCommands.Entities.Builders
 {
-    public class ApplicationCommandBuilder : IBuilder<ApplicationCommand>
+    public class ApplicationCommandBuilder : IBuilder<DiscordApplicationCommand>
     {
         public string Name { get; set; }
         public string Description { get; set; }
@@ -47,21 +49,16 @@ namespace DSharpPlus.SlashCommands.Entities.Builders
             return this;
         }
 
-        public ApplicationCommand Build()
+        public DiscordApplicationCommand Build()
         {
-            List<ApplicationCommandOption> options = new();
+            List<DiscordApplicationCommandOption> options = new();
             foreach (var op in Options)
                 options.Add(op.Build());
 
             if (Description is null || Description == "")
                 Description = "none provided";
 
-            return new ApplicationCommand()
-            {
-                Name = Name,
-                Description = Description,
-                Options = options.Count > 0 ? options.ToArray() : null
-            };
+            return new DiscordApplicationCommand(Name, Description, options);
         }
     }
 }

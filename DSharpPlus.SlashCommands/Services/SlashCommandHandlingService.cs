@@ -463,7 +463,7 @@ namespace DSharpPlus.SlashCommands.Services
                 { // ... get the new command data ...
                     var jsonResult = await response.Content.ReadAsStringAsync();
 
-                    var newCommand = JsonConvert.DeserializeObject<ApplicationCommand>(jsonResult);
+                    var newCommand = JsonConvert.DeserializeObject<DiscordApplicationCommand>(jsonResult);
 
                     // ... and the old command data ...
                     var oldCommand = Commands[update.Name];
@@ -481,7 +481,7 @@ namespace DSharpPlus.SlashCommands.Services
             }
         }
 
-        private ApplicationCommand BuildApplicationCommand(SlashCommand cmd)
+        private DiscordApplicationCommand BuildApplicationCommand(SlashCommand cmd)
         {
             // Create the command builder object ...
             var builder = new ApplicationCommandBuilder()

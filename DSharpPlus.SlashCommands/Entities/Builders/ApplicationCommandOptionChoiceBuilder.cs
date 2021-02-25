@@ -1,8 +1,10 @@
 ﻿using System;
 
+using DSharpPlus.Entities;
+
 namespace DSharpPlus.SlashCommands.Entities.Builders
 {
-    public class ApplicationCommandOptionChoiceBuilder : IBuilder<ApplicationCommandOptionChoice>
+    public class ApplicationCommandOptionChoiceBuilder : IBuilder<DiscordApplicationCommandOptionChoice>
     {
         public string Name { get; set; }
 
@@ -41,13 +43,9 @@ namespace DSharpPlus.SlashCommands.Entities.Builders
             return this;
         }
 
-        public ApplicationCommandOptionChoice Build()
+        public DiscordApplicationCommandOptionChoice Build()
         {
-            return new ApplicationCommandOptionChoice()
-            {
-                Name = Name,
-                Value = Value
-            };
+            return new DiscordApplicationCommandOptionChoice(Name, Value);
         }
     }
 }

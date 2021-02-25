@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands.Enums;
 
 namespace DSharpPlus.SlashCommands.Entities.Builders
 {
-    public class ApplicationCommandOptionBuilder : IBuilder<ApplicationCommandOption>
+    public class ApplicationCommandOptionBuilder : IBuilder<DiscordApplicationCommandOption>
     {
         public ApplicationCommandOptionType Type { get; set; }
         public string Name { get; set; }
@@ -108,26 +109,17 @@ namespace DSharpPlus.SlashCommands.Entities.Builders
             return this;
         }
 
-        public ApplicationCommandOption Build()
+        public DiscordApplicationCommandOption Build()
         {
-            List<ApplicationCommandOptionChoice> choices = new();
+            List<DiscordApplicationCommandOptionChoice> choices = new();
             foreach (var ch in Choices)
                 choices.Add(ch.Build());
 
-            List<ApplicationCommandOption> options = new();
+            List<DiscordApplicationCommandOption> options = new();
             foreach (var op in Options)
                 options.Add(op.Build());
 
-            return new ApplicationCommandOption()
-            {
-                Name = Name,
-                Description = Description,
-                Default = Default,
-                Required = Required,
-                Type = Type,
-                Choices = choices.Count > 0 ? choices.ToArray() : null,
-                Options = options.Count > 0 ? options.ToArray() : null
-            };
+            return new DiscordApplicationCommandOption(Name, Description, Required, choices, options);
         }
     }
 }
