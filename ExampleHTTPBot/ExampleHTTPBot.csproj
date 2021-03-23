@@ -15,4 +15,10 @@
     <ProjectReference Include="..\DSharpPlus.SlashCommands\DSharpPlus.SlashCommands.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Config\bot_config.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
