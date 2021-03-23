@@ -148,10 +148,10 @@ namespace DSharpPlus.SlashCommands.Services
 
                 foreach(var val in options)
                 {
-                    if (val.OptionType is null)
+                    if (val.Value is null)
                         continue;
 
-                    args.Add(val.OptionType);
+                    args.Add(val.Value);
                 }
 
                 return args.ToArray();

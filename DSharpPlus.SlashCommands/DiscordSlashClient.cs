@@ -100,10 +100,8 @@ namespace DSharpPlus.SlashCommands
             await _slash.StartAsync(_config.Token, ApplicationId);
         }
 
-        public async Task<bool> HandleGatewayEvent(InteractionCreateEventArgs args)
+        public async Task<bool> HandleGatewayEvent(DiscordClient client, InteractionCreateEventArgs args)
         {
-            var client = GetBaseClientForRequest(args.Interaction.GuildId);
-
             await _slash.HandleInteraction(client, args.Interaction, this);
 
             var data = GetDeafultResponse().Build();
@@ -154,16 +152,30 @@ namespace DSharpPlus.SlashCommands
             return GetDeafultResponse().Build();
         }
 
-        private BaseDiscordClient GetBaseClientForRequest(ulong guildId = 0)
+        private BaseDiscordClient GetBaseClientForRequest(ulong? guildId = null)
         {
             BaseDiscordClient? client = null;
             if (_discord is not null)
                 client = _discord;
-            else if (_sharded is not null)
+
+            if (client is null)
             {
-                foreach (var shard in _sharded.ShardClients)
-                    if (shard.Value.Guilds.ContainsKey(guildId))
-                        client = shard.Value;
+                if (guildId is null)
+                {
+                    if(_sharded is not null && _sharded.ShardClients.Count > 0)
+                    {
+                        client = _sharded.ShardClients[0];
+                    }
+                }
+                else
+                {
+                    if (_sharded is not null)
+                    {
+                        foreach (var shard in _sharded.ShardClients)
+                            if (shard.Value.Guilds.ContainsKey(guildId.Value))
+                                client = shard.Value;
+                    }
+                }
             }
 
             if (client is null)

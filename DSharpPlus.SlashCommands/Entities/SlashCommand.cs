@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DSharpPlus.SlashCommands.Entities
 {
@@ -43,18 +44,20 @@ namespace DSharpPlus.SlashCommands.Entities
         /// <returns>True if the command was attempted, false if there was no command to attempt.</returns>
         public bool ExecuteCommand(BaseDiscordClient c, InteractionContext ctx, params object[] args)
         {
-            List<object> combinedArgs = new List<object>();
-            combinedArgs.Add(ctx);
+            List<object> combinedArgs = new List<object>
+            {
+                ctx
+            };
             combinedArgs.AddRange(args);
 
             var cArgs = combinedArgs.ToArray();
 
             if (Command is not null)
             {
-                Command.ExecuteCommand(c, ctx.Interaction.GuildId, cArgs);
+                _ = Task.Run(async () => await Command.ExecuteCommand(c, ctx.Interaction.GuildId, cArgs));
                 return true;
             }
-            else 
+            else
             {
                 if(Subcommands is null) return false;
 
@@ -68,7 +71,7 @@ namespace DSharpPlus.SlashCommands.Entities
                         {
                             if(cmdGroup.Commands.TryGetValue(cmdData.Name, out var cmd))
                             {
-                                cmd.ExecuteCommand(c, ctx.Interaction.GuildId, cArgs);
+                                _ = Task.Run(async () => await cmd.ExecuteCommand(c, ctx.Interaction.GuildId, cArgs));
                                 return true;
                             }
                         }

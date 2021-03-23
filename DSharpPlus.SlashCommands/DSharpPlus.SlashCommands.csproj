@@ -14,6 +14,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00820" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00820" />
+    <PackageReference Include="DSharpPlus.Rest" Version="4.0.0-nightly-00820" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
@@ -22,11 +25,5 @@
 
   <ItemGroup>
     <None Include="LICENSE" Pack="true" Visible="false" PackagePath="" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\DSharpPlusInteractionEvents\DSharpPlus.CommandsNext\DSharpPlus.CommandsNext.csproj" />
-    <ProjectReference Include="..\..\DSharpPlusInteractionEvents\DSharpPlus.Rest\DSharpPlus.Rest.csproj" />
-    <ProjectReference Include="..\..\DSharpPlusInteractionEvents\DSharpPlus\DSharpPlus.csproj" />
   </ItemGroup>  
 </Project>

@@ -22,7 +22,7 @@ namespace DSharpPlus.SlashCommands.Entities
             BaseCommand = commandInstance;
         }
 
-        public async Task ExecuteCommand(BaseDiscordClient c, ulong guildId, params object[] args)
+        public async Task ExecuteCommand(BaseDiscordClient c, ulong? guildId, params object[] args)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace DSharpPlus.SlashCommands.Entities
             }
         }
 
-        private async Task<object[]> ParseArguments(BaseDiscordClient c, ulong guildId, object[] args)
+        private async Task<object[]> ParseArguments(BaseDiscordClient c, ulong? guildId, object[] args)
         {
             var parsedArgs = new object[args.Length];
             var parameters = ExecutionMethod.GetParameters();
@@ -71,9 +71,9 @@ namespace DSharpPlus.SlashCommands.Entities
 
                     parsedArgs[i] = chan;
                 }
-                else if (param.ParameterType == typeof(DiscordRole))
+                else if (param.ParameterType == typeof(DiscordRole) && guildId is not null)
                 {
-                    var r = await ParseRole(args[i], c, guildId);
+                    var r = await ParseRole(args[i], c, guildId.Value);
 
                     if (r is null)
                         throw new ArgumentNullException(param.Name, "Failed to parse Discord result to DisocrdRole value");
@@ -117,15 +117,12 @@ namespace DSharpPlus.SlashCommands.Entities
             {
                 ulong argVal = Convert.ToUInt64(arg);
 
-                switch (client)
+                return client switch
                 {
-                    case DiscordClient discord:
-                        return await discord.GetUserAsync(argVal);
-                    case DiscordRestClient rest:
-                        return await rest.GetUserAsync(argVal);
-                }
-
-                return null;
+                    DiscordClient discord => await discord.GetUserAsync(argVal),
+                    DiscordRestClient rest => await rest.GetUserAsync(argVal),
+                    _ => null,
+                };
             }
             catch
             {
@@ -140,16 +137,12 @@ namespace DSharpPlus.SlashCommands.Entities
             try
             {
                 ulong argVal = Convert.ToUInt64(arg);
-
-                switch (client)
+                return client switch
                 {
-                    case DiscordClient discord:
-                        return await discord.GetChannelAsync(argVal);
-                    case DiscordRestClient rest:
-                        return await rest.GetChannelAsync(argVal);
-                }
-
-                return null;
+                    DiscordClient discord => await discord.GetChannelAsync(argVal),
+                    DiscordRestClient rest => await rest.GetChannelAsync(argVal),
+                    _ => null,
+                };
             }
             catch
             {
