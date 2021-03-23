@@ -9,6 +9,9 @@ A SlashCommand implementation for DSharpPlus. This does not connect to the gatew
 
 ## Install the Lib
 **Nuget Package:** `Soyvolon.DSharpPlus.SlashCommands`
+
+The package requires `DSharpPlus 4.0.0-nightly-00820`, along with `DSharpPlus.CommandsNext` and `DSharpPlus.Rest` of the same version.
+
 ## Creating a new Project
 Create a new .NET Core project for your Discord Bot (or add to an existing one).
 
