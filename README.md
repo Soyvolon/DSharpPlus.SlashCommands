@@ -103,7 +103,7 @@ As the client starts, it will build a JSON file inside the executing assembly. T
 # Gateway Quickstart
 > This is for basic uses. Use this if you do not have any experience in HTTP applications and/or web APIs!
 
-**The example for this style of project is under [`ExampleGatewayBot`]()**
+**The example for this style of project is under [`ExampleGatewayBot`](https://github.com/Soyvolon/DSharpPlus.SlashCommands/tree/master/ExampleGatewayBot)**
 
 ## Handling Incoming Gateway Messages
 On your `DiscordClient` or `DiscordShardedClient`, handle the `InteractionCreated` event just like any other event by passing the `Slash.HandleGatewayEvent` method to the `DiscordClient.InteractionCreated` event.
@@ -122,14 +122,14 @@ public static void Main(string[] args)
 Its that simple with the gateway!
 
 > **Congrats, you now have SlashCommands setup!** <br />
-*Example code was from the [`ExampleGatewayBot`]() project.*
+*Example code was from the [`ExampleGatewayBot`](https://github.com/Soyvolon/DSharpPlus.SlashCommands/tree/master/ExampleGatewayBot) project.*
 
 For more things to do with slash commands, see [Further Options](#further-options)
 
 # HTTP Quickstart
 > This is for advanced uses! There is a lot more setup to be completed in this tutorial. For basic slash commands, the [Gateway Quickstart](#gateway-quickstart) is recommended.
 
-**The example for this style of project is under [`ExampleHTTPBot`]()**
+**The example for this style of project is under [`ExampleHTTPBot`](https://github.com/Soyvolon/DSharpPlus.SlashCommands/tree/master/ExampleHTTPBot)**
 
 ## Handling Incoming Webhooks
 Now that the `DiscordSlashClient` is running, you need to handle incoming webhooks from Discord.
@@ -394,7 +394,7 @@ Once the bot is running, and your API is ready to receive requests, head over to
 Once you hit save, Discord is going to send a `POST` request to your URL (thus why it needs to be port-forwarded or on a server). This is where the Ping response comes in. Your app will recognize the Ping, respond with Pong, and Discord will save your endpoint.
 
 > **Congrats, you now have SlashCommands setup!** <br />
-*Example code was from the [`ExampleHTTPBot`]() project.*
+*Example code was from the [`ExampleHTTPBot`](https://github.com/Soyvolon/DSharpPlus.SlashCommands/tree/master/ExampleHTTPBot) project.*
 
 For more things to do with slash commands, see [Further Options](#further-options)
 
