@@ -16,9 +16,9 @@ namespace DSharpPlus.SlashCommands.Entities
     {
         private readonly DiscordSlashClient _client;
 
-        public Interaction Interaction { get; internal set; }
+        public DiscordInteraction Interaction { get; internal set; }
 
-        public InteractionContext(DiscordSlashClient c, Interaction i)
+        public InteractionContext(DiscordSlashClient c, DiscordInteraction i)
         {
             _client = c;
             Interaction = i;

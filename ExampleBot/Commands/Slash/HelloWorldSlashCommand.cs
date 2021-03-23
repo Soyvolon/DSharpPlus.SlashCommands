@@ -32,7 +32,7 @@ namespace ExampleBot.Commands.Slash
                 .WithData(new InteractionApplicationCommandCallbackDataBuilder()
                     .WithEmbed(new DiscordEmbedBuilder()
                         .WithTitle("Hello World!")
-                        .WithDescription($"And hello to you too, {ctx.Interaction.User.Username}"))
+                        .WithDescription($"And hello to you too, {ctx.Interaction.Member.Username}"))
                     .WithContent("How's Life?"));
 
             await ctx.ReplyAsync(response.Build());

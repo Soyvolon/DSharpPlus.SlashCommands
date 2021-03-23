@@ -4,15 +4,18 @@ A SlashCommand implementation for DSharpPlus. This does not connect to the gatew
 # Notices
 ### While commands will be added to Discord, not all limit checks are done by this utility. Please make sure you are not violating them yourself by checking the limits [here](#command-limits).
 ### Standard DI is not implemented, the IServiceProvider is how you can get services as of right now
-### You cant add services to the IServiceProvider at the moment, but it does have a logger for logging.
 
 # Quickstart
-> The ExampleBot project is a working example on how to use SlashCommands with a DiscordClient from DSharpPlus.
 
 ## Install the Lib
 **Nuget Package:** `Soyvolon.DSharpPlus.SlashCommands`
+
+The package requires `DSharpPlus 4.0.0-nightly-00820`, along with `DSharpPlus.CommandsNext` and `DSharpPlus.Rest` of the same version.
+
 ## Creating a new Project
-As this lib currently only supports Webhook interaction, make sure to create an ASP.NET Core Web application. It is recommended to use an ASP.NET Core Web API if nothing else will be created on the web app.
+Create a new .NET Core project for your Discord Bot (or add to an existing one).
+
+*If you are planning on using an HTTP connection, you must have an ASP.NET Core project (or equivalent web application).*
 
 ## Create the `DiscordSlashClient`
 A Discord Slash Client requires two things:
@@ -91,6 +94,42 @@ As the client starts, it will build a JSON file inside the executing assembly. T
 > Deleting the JSON file can case unexpected command behavior where commands don't get deleted when they are supposed to, or commands are not updated correctly after version numbers update.
 
 > This JSON file is for a single application only, running the same client on two different applications can cause unexpected behavior as well.
+
+## Next Steps
+
+1. [Quickstart for Gateway Connections](#gateway-quickstart)
+2. [Quickstart for HTTP Connections](#http-quickstart)
+
+# Gateway Quickstart
+> This is for basic uses. Use this if you do not have any experience in HTTP applications and/or web APIs!
+
+**The example for this style of project is under [`ExampleGatewayBot`]()**
+
+## Handling Incoming Gateway Messages
+On your `DiscordClient` or `DiscordShardedClient`, handle the `InteractionCreated` event just like any other event by passing the `Slash.HandleGatewayEvent` method to the `DiscordClient.InteractionCreated` event.
+
+```csharp
+public static void Main(string[] args)
+{
+    DiscordClient MyDiscordClient = new DiscordClient(MyDiscordConfiguration);
+    DiscordSlashClient Slash = new DiscordSlashClient(MyDiscordSlashClientConfiguration);
+    // ...
+    MyDiscordClient.InteractionCreated += Slash.HandleGatewayEvent;
+    // ...
+}
+```
+
+Its that simple with the gateway!
+
+> **Congrats, you now have SlashCommands setup!** <br />
+*Example code was from the [`ExampleGatewayBot`]() project.*
+
+For more things to do with slash commands, see [Further Options](#further-options)
+
+# HTTP Quickstart
+> This is for advanced uses! There is a lot more setup to be completed in this tutorial. For basic slash commands, the [Gateway Quickstart](#gateway-quickstart) is recommended.
+
+**The example for this style of project is under [`ExampleHTTPBot`]()**
 
 ## Handling Incoming Webhooks
 Now that the `DiscordSlashClient` is running, you need to handle incoming webhooks from Discord.
@@ -355,7 +394,9 @@ Once the bot is running, and your API is ready to receive requests, head over to
 Once you hit save, Discord is going to send a `POST` request to your URL (thus why it needs to be port-forwarded or on a server). This is where the Ping response comes in. Your app will recognize the Ping, respond with Pong, and Discord will save your endpoint.
 
 > **Congrats, you now have SlashCommands setup!** <br />
-*Example code was from the ExampleBot project.*
+*Example code was from the [`ExampleHTTPBot`]() project.*
+
+For more things to do with slash commands, see [Further Options](#further-options)
 
 # Further Options
 ## Creating Subcommands

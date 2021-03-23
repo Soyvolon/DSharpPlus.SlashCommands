@@ -19,7 +19,7 @@ namespace ExampleBot.Commands.Discord
             var pingEmbed = new DiscordEmbedBuilder().WithColor(DiscordColor.CornflowerBlue).WithTitle($"Ping for Shard {ctx.Client.ShardId}");
             pingEmbed.AddField("WS Latency:", $"{ctx.Client.Ping}ms");
             timer.Start();
-            DiscordMessage msg = await ctx.RespondAsync(null, false, pingEmbed);
+            DiscordMessage msg = await ctx.RespondAsync(pingEmbed);
             await msg.ModifyAsync(null, pingEmbed.AddField("Response Time: (:ping_pong:)", $"{timer.ElapsedMilliseconds}ms").Build());
             timer.Stop();
         }
