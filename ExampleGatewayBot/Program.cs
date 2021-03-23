@@ -38,26 +38,11 @@ namespace ExampleGatewayBot
                 MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Debug
             });
 
-            // ... register commands ...
-            var next = Discord.UseCommandsNext(new CommandsNextConfiguration
-            {
-                StringPrefixes = new string[] { jobj["prefix"].ToString() }
-            });
-
-            next.RegisterCommands(Assembly.GetExecutingAssembly());
-            // ... register the interaction event ...
-            Discord.InteractionCreated += Discord_InteractionCreated;
-            Discord.ApplicationCommandCreated += Discord_ApplicationCommandCreated;
-            Discord.ApplicationCommandDeleted += Discord_ApplicationCommandDeleted;
-            Discord.ApplicationCommandUpdated += Discord_ApplicationCommandUpdated;
-
-            // ... connect to discord ...
-            Discord.ConnectAsync().GetAwaiter().GetResult();
-
+            // ... create a custom default response ...
             var defaultResponseData = new InteractionApplicationCommandCallbackDataBuilder()
                 .WithContent("`Test Automated Response`");
 
-            // ... use the discord connection to build the Slash Client config ...
+            // ... use the discord client to build the Slash Client config ...
             Slash = new DiscordSlashClient(new DiscordSlashConfiguration
             {
                 Client = Discord,
@@ -66,6 +51,22 @@ namespace ExampleGatewayBot
                 DefaultResponseData = defaultResponseData
             });
 
+            // ... register normal bot commands ...
+            var next = Discord.UseCommandsNext(new CommandsNextConfiguration
+            {
+                StringPrefixes = new string[] { jobj["prefix"].ToString() }
+            });
+
+            next.RegisterCommands(Assembly.GetExecutingAssembly());
+            // ... register the interaction event ...
+            Discord.InteractionCreated += Slash.HandleGatewayEvent;
+            Discord.ApplicationCommandCreated += Discord_ApplicationCommandCreated;
+            Discord.ApplicationCommandDeleted += Discord_ApplicationCommandDeleted;
+            Discord.ApplicationCommandUpdated += Discord_ApplicationCommandUpdated;
+
+            // ... connect to discord ...
+            Discord.ConnectAsync().GetAwaiter().GetResult();
+            // ... register the slash commands ...
             Slash.RegisterCommands(Assembly.GetExecutingAssembly());
 
             // ... start the slash client ...
@@ -90,7 +91,5 @@ namespace ExampleGatewayBot
             Discord.Logger.LogInformation($"Shard {sender.ShardId} sent application command created: {e.Command.Name}: {e.Command.Id} for {e.Command.ApplicationId}");
             return Task.CompletedTask;
         }
-        private static async Task Discord_InteractionCreated(DiscordClient sender, DSharpPlus.EventArgs.InteractionCreateEventArgs e)
-            => await Slash.HandleGatewayEvent(e);
     }
 }
