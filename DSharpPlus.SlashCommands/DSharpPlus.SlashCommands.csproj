@@ -4,7 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
     <PackageId>Soyvolon.DSharpPlus.SlashCommands</PackageId>
-    <Version>0.4.0</Version>
+    <Version>0.4.1</Version>
     <Authors>Soyvolon</Authors>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
 
