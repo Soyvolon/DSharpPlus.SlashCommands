@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands.Attributes;
 using DSharpPlus.SlashCommands.Entities;
@@ -57,7 +58,7 @@ namespace ExampleGatewayBot.Commands
             DiscordUser user, DiscordChannel channel, DiscordRole role)
         {
             var response = new InteractionResponseBuilder()
-                .WithType(InteractionResponseType.ChannelMessage)
+                .WithType(InteractionResponseType.ChannelMessageWithSource)
                 .WithData(new InteractionApplicationCommandCallbackDataBuilder()
                     .WithEmbed(new DiscordEmbedBuilder()
                         .WithTitle("Testing Arguments!")

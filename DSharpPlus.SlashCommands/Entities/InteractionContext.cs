@@ -39,7 +39,7 @@ namespace DSharpPlus.SlashCommands.Entities
 
             return await ReplyAsync(new InteractionResponse()
             {
-                Type = showSource ? InteractionResponseType.ChannelMessageWithSource : InteractionResponseType.ChannelMessage,
+                Type = showSource ? InteractionResponseType.ChannelMessageWithSource : InteractionResponseType.DeferredChannelMessageWithSource,
                 Data = new InteractionApplicationCommandCallbackData()
                 {
                     Content = message,
@@ -83,7 +83,7 @@ namespace DSharpPlus.SlashCommands.Entities
 
             return await EditResponseAsync(new InteractionResponse()
             { 
-                Type = InteractionResponseType.ChannelMessage,
+                Type = InteractionResponseType.ChannelMessageWithSource,
                 Data = new InteractionApplicationCommandCallbackData()
                 { 
                     Content = message,

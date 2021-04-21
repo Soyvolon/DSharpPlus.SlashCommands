@@ -82,7 +82,7 @@ namespace DSharpPlus.SlashCommands.Services
             BotId = clientId;
 
             LoadCommandTree();
-            await VerifyCommandState();
+            await BulkUpdateCommands();
         }
 
         public Task HandleInteraction(BaseDiscordClient discord, DiscordInteraction interact, DiscordSlashClient c)
@@ -321,152 +321,38 @@ namespace DSharpPlus.SlashCommands.Services
             Commands = new(commands);
         }
 
-        private async Task VerifyCommandState()
+        private async Task BulkUpdateCommands()
         {
-            _logger.LogInformation("Attempting to read previous slash command state ...");
+            List<DiscordApplicationCommand> commandList = new();
+            foreach (SlashCommand c in Commands.Values)
+                commandList.Add(BuildApplicationCommand(c));
 
-            string json;
-            // (Use sectioned using statements here beacuse we will write to the JSON file later in this method)
-            // Get the JSON string for the last saved state ...
-            using (FileStream fs = new(ConfigPath, FileMode.OpenOrCreate))
+            var json = JsonConvert.SerializeObject(commandList, Formatting.None, new JsonSerializerSettings
             {
-                using (StreamReader sr = new(fs))
-                {
-                    json = await sr.ReadToEndAsync();
-                }
-            }
-            // ... If the json is null, or blank, use a new commandState object ...
-            List<SlashCommandConfiguration> commandState = new();
-            if (json is not null && json != "")
-            { // ... otherwise, read from JSON the last state of the commands.
-                commandState = JsonConvert.DeserializeObject<List<SlashCommandConfiguration>>(json);
-            }
+                NullValueHandling = NullValueHandling.Ignore,
+                DefaultValueHandling = DefaultValueHandling.Ignore
+            });
 
-            _logger.LogInformation("... loaded previous slash command state, comparing to current state ...");
-            // ... build our update and delete lists ...
-            List<SlashCommand> toUpdate = new();
-            List<SlashCommandConfiguration> toRemove = new();
-            // ... and for every command in commandState ...
-            foreach(var cmd in commandState)
-            { // ... see if Commands contains the command name ...
-                if(Commands.TryGetValue(cmd.Name, out var slashCommand))
-                { // ... if it is there, and the version number is lower in the saved state ...
-                    if (cmd.Version < slashCommand.Version)
-                    {
-                        // ... queue the command for an update.
-                        toUpdate.Add(slashCommand);
-                    }
-                    else
-                    { // ... otherwise, udpate the slash command with the saved values.
-                        slashCommand.CommandId = cmd.CommandId;
-                        slashCommand.GuildId = cmd.GuildId;
-                        slashCommand.ApplicationId = BotId;
-                    }
-                }
-                else
-                { // ... if its in the config but not in the code
-                    // queue the command for deletion.
-                    toRemove.Add(cmd);
-                }
-            }
-            // ... then get all the new commands by finding commands that are not in the config file ...
-            var newCommands = Commands.Where(x => !commandState.Any(y => y.Name == x.Key));
-            foreach (var c in newCommands)
-                // ... and add them to the update list.
-                toUpdate.Add(c.Value);
+            HttpRequestMessage msg = new();
+            msg.Method = HttpMethod.Put;
+            msg.Content = new StringContent(json);
+            msg.Content.Headers.ContentType = new("application/json");
+            msg.RequestUri = new Uri($"https://discord.com/api/applications/{BotId}/commands");
 
-            _logger.LogInformation("... built update and remove lists, running update and remove operations ...");
-            // ... then update/add the commands ...
-            await UpdateOrAddCommand(toUpdate);
-            // ... and delete any old commands ...
-            await RemoveOldCommands(toRemove);
+            _logger.LogInformation("Executing command update");
 
-            _logger.LogInformation("... updates recorded to database, saving state to file ....");
+            var response = await _client.SendAsync(msg);
 
-            // ... get the configurations for all the commands ...
-            List<SlashCommandConfiguration> configs = new List<SlashCommandConfiguration>();
-            foreach (var c in Commands.Values)
-                configs.Add(c.GetConfiguration());
-            // ... and write them to the local state file.
-            await File.WriteAllTextAsync(ConfigPath, JsonConvert.SerializeObject(configs, Formatting.Indented));
-
-            _logger.LogInformation("... State saved.");
-        }
-
-        private async Task RemoveOldCommands(List<SlashCommandConfiguration> toRemove)
-        {
-            // For every command that needs to be removed ...
-            foreach (var scfg in toRemove)
+            if(response.IsSuccessStatusCode)
             {
-                // ... build a new HTTP request message ...
-                HttpRequestMessage msg = new();
-                // ... with a bot authorization ...
-                msg.Headers.Authorization = new("Bot", Token);
-                // ... and a method of DELETE ...
-                msg.Method = HttpMethod.Delete;
-                // ... then check to see if there is a guild ID
-                if (scfg.GuildId is not null)
-                { // ... if there is, set the requset URI to a guild delete.
-                    msg.RequestUri = new Uri($"https://discord.com/api/applications/{BotId}/guilds/{scfg.GuildId}/commands/{scfg.CommandId}");
-                }
-                else
-                { // .... if there is not, set the request URI to a global delete.
-                    msg.RequestUri = new Uri($"https://discord.com/api/applications/{BotId}/commands/{scfg.CommandId}");
-                }
-                // ... and send the request to discord ...
-                var response = await _client.SendAsync(msg);
-                // ... if it succeded ...
-                if(response.IsSuccessStatusCode)
-                { // ... remove it from the commands list.
-                    Commands.TryRemove(scfg.Name, out _);
-                }
-                else
-                { // ... otherwise log the error.
-                    _logger.LogError($"Failed to delete command: ${response.ReasonPhrase}");
-                }
-            }
-        }
+                var responseJson = await response.Content.ReadAsStringAsync();
 
-        private async Task UpdateOrAddCommand(List<SlashCommand> toUpdate)
-        {
-            // For every command in the to update list ...
-            foreach(var update in toUpdate)
-            { // ... get the command object ...
-                var cmd = BuildApplicationCommand(update);
-                // ... authenticate the request message ...
-                HttpRequestMessage msg = new();
-                msg.Headers.Authorization = new("Bot", Token);
-                msg.Method = HttpMethod.Post;
-                // ... read the command object, ignoring default and null fields ...
-                var json = JsonConvert.SerializeObject(cmd, Formatting.Indented, new JsonSerializerSettings
+                var commands = JsonConvert.DeserializeObject<List<DiscordApplicationCommand>>(responseJson);
+
+                foreach(DiscordApplicationCommand newCommand in commands)
                 {
-                    NullValueHandling = NullValueHandling.Ignore,
-                    DefaultValueHandling = DefaultValueHandling.Ignore
-                });
-                // ... set the content of the request ...
-                msg.Content = new StringContent(json);
-                msg.Content.Headers.ContentType = new("application/json");
-
-                // ... then check to see if there is a guild ID
-                if (update.GuildId is not null)
-                { // ... if there is, set the requset URI to a guild update.
-                    msg.RequestUri = new Uri($"https://discord.com/api/applications/{BotId}/guilds/{update.GuildId}/commands");
-                }
-                else
-                { // ... if there is not, set the request URI to a global update.
-                    msg.RequestUri = new Uri($"https://discord.com/api/applications/{BotId}/commands");
-                }
-                // ... then send and wait for a response ...
-                var response = await _client.SendAsync(msg);
-                // ... if the response is a success ...
-                if(response.IsSuccessStatusCode)
-                { // ... get the new command data ...
-                    var jsonResult = await response.Content.ReadAsStringAsync();
-
-                    var newCommand = JsonConvert.DeserializeObject<DiscordApplicationCommand>(jsonResult);
-
                     // ... and the old command data ...
-                    var oldCommand = Commands[update.Name];
+                    var oldCommand = Commands[newCommand.Name];
                     // ... then update the old command with the new command.
                     if (newCommand is not null && oldCommand is not null)
                     {
@@ -474,10 +360,12 @@ namespace DSharpPlus.SlashCommands.Services
                         oldCommand.CommandId = newCommand.Id;
                     }
                 }
-                else
-                { // ... otherwise log the error.
-                    _logger.LogError(await response.Content.ReadAsStringAsync());
-                }
+
+                _logger.LogInformation("Command update complete.");
+            }
+            else
+            {
+                _logger.LogCritical($"Command update failed. {response.ReasonPhrase}");
             }
         }
 

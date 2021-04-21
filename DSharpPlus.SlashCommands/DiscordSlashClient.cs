@@ -90,8 +90,7 @@ namespace DSharpPlus.SlashCommands
         public async Task StartAsync()
         {
             // Set this restriction to ensure proper response for async command handling.
-            if ((_config.DefaultResponseType != Enums.InteractionResponseType.Acknowledge
-                && _config.DefaultResponseType != Enums.InteractionResponseType.ACKWithSource)
+            if ((_config.DefaultResponseType != InteractionResponseType.ChannelMessageWithSource)
                 && _config.DefaultResponseData is null)
                 throw new Exception("DeafultResponseData must not be null if not using ResponseType of Acknowledge or ACKWithSource.");
                 
@@ -110,7 +109,7 @@ namespace DSharpPlus.SlashCommands
             {
                 Method = HttpMethod.Post,
                 RequestUri = GetGatewayFollowupUri(args.Interaction.Id.ToString(), args.Interaction.Token),
-                Content = new StringContent(JsonConvert.SerializeObject(data))
+                Content = new StringContent(JsonConvert.SerializeObject(data, _jsonSettings))
             };
 
             msg.Content.Headers.ContentType = new(_contentType);
@@ -190,8 +189,7 @@ namespace DSharpPlus.SlashCommands
             var response = new InteractionResponseBuilder()
                 .WithType(_config.DefaultResponseType);
             // ... add the optional configs ...
-            if (_config.DefaultResponseType != Enums.InteractionResponseType.Acknowledge
-                && _config.DefaultResponseType != Enums.InteractionResponseType.ACKWithSource)
+            if (_config.DefaultResponseType == InteractionResponseType.ChannelMessageWithSource)
             {
                 response.Data = _config.DefaultResponseData;
             }
@@ -206,8 +204,7 @@ namespace DSharpPlus.SlashCommands
         /// <returns>Update task</returns>
         internal async Task<DiscordMessage?> UpdateAsync(InteractionResponse edit, string token)
         {
-            if(_config.DefaultResponseType == Enums.InteractionResponseType.Acknowledge
-                || _config.DefaultResponseType == Enums.InteractionResponseType.ACKWithSource)
+            if(_config.DefaultResponseType == InteractionResponseType.ChannelMessageWithSource)
                 throw new Exception("Can't edit default response when using Acknowledge or ACKWithSource.");
 
             var request = new HttpRequestMessage()
@@ -234,8 +231,7 @@ namespace DSharpPlus.SlashCommands
         /// <returns>Delete task</returns>
         internal async Task<DiscordMessage?> DeleteAsync(string token)
         {
-            if(_config.DefaultResponseType == Enums.InteractionResponseType.Acknowledge
-                || _config.DefaultResponseType == Enums.InteractionResponseType.ACKWithSource)
+            if(_config.DefaultResponseType == InteractionResponseType.ChannelMessageWithSource)
                 throw new Exception("Can't delete default response when using Acknowledge or ACKWithSource.");
 
             var request = new HttpRequestMessage()

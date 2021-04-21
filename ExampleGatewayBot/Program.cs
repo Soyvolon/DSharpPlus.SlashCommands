@@ -60,6 +60,11 @@ namespace ExampleGatewayBot
             next.RegisterCommands(Assembly.GetExecutingAssembly());
             // ... register the interaction event ...
             Discord.InteractionCreated += Slash.HandleGatewayEvent;
+            Discord.InteractionCreated += (x, y) =>
+            {
+                Discord.Logger.LogInformation("Interaction Created Received");
+                return Task.CompletedTask;
+            };
             Discord.ApplicationCommandCreated += Discord_ApplicationCommandCreated;
             Discord.ApplicationCommandDeleted += Discord_ApplicationCommandDeleted;
             Discord.ApplicationCommandUpdated += Discord_ApplicationCommandUpdated;

@@ -21,7 +21,7 @@ namespace DSharpPlus.SlashCommands
         /// <summary>
         /// The Default Response type that is sent to Discord upon receiving a request.
         /// </summary>
-        public InteractionResponseType DefaultResponseType { get; set; } = InteractionResponseType.ACKWithSource;
+        public InteractionResponseType DefaultResponseType { get; set; } = InteractionResponseType.DeferredChannelMessageWithSource;
         /// <summary>
         /// The default data to be used when the DefaultResponseType is ChannelMessage or ChannelMessageWithSource.
         /// </summary>

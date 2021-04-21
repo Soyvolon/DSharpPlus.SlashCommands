@@ -119,7 +119,7 @@ namespace DSharpPlus.SlashCommands.Entities.Builders
             foreach (var op in Options)
                 options.Add(op.Build());
 
-            return new DiscordApplicationCommandOption(Name, Description, Required, choices, options);
+            return new DiscordApplicationCommandOption(Name, Description, Type, Required, choices, options);
         }
     }
 }
