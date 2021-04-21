@@ -90,9 +90,9 @@ namespace DSharpPlus.SlashCommands
         public async Task StartAsync()
         {
             // Set this restriction to ensure proper response for async command handling.
-            if ((_config.DefaultResponseType != InteractionResponseType.ChannelMessageWithSource)
+            if ((_config.DefaultResponseType == InteractionResponseType.ChannelMessageWithSource)
                 && _config.DefaultResponseData is null)
-                throw new Exception("DeafultResponseData must not be null if not using ResponseType of Acknowledge or ACKWithSource.");
+                throw new Exception("DeafultResponseData must not be null if not using ResponseType of ChannelMessageWithSource.");
                 
 
             // Initialize the command handling service (and therefor updating command on discord).
