@@ -67,14 +67,17 @@ namespace ExampleBot
             IServiceCollection c = new ServiceCollection();
             c.AddTransient<TestService>();
 
+            var provider = c.BuildServiceProvider();
+
             // ... use the discord connection to build the Slash Client config ...
             Slash = new DiscordSlashClient(new DiscordSlashConfiguration
             {
                 Client = Discord,
                 Token = jobj["token"].ToString(),
                 DefaultResponseType = InteractionResponseType.ChannelMessageWithSource,
-                DefaultResponseData = defaultResponseData
-            }, c);
+                DefaultResponseData = defaultResponseData,
+                Services = provider
+            });
 
             Slash.RegisterCommands(Assembly.GetExecutingAssembly());
 

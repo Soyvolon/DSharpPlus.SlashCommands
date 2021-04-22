@@ -1,4 +1,6 @@
-﻿using DSharpPlus.SlashCommands.Entities;
+﻿using System;
+
+using DSharpPlus.SlashCommands.Entities;
 using DSharpPlus.SlashCommands.Entities.Builders;
 using DSharpPlus.SlashCommands.Enums;
 
@@ -30,5 +32,9 @@ namespace DSharpPlus.SlashCommands
         /// If Discord is to wait for confirmation that a message has been saved before sending a reply back to the SlashClient.
         /// </summary>
         public bool WaitForConfirmation { get; set; } = true;
+        /// <summary>
+        /// Services for dependency injection for slash commands.
+        /// </summary>
+        public IServiceProvider? Services { get; set; } = null;
     }
 }

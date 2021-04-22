@@ -50,7 +50,7 @@ namespace DSharpPlus.SlashCommands.Services
         /// <param name="services">Services for DI (which is kinda not really implemented)</param>
         /// <param name="http">HTTP Client for making web requests to the Discord API</param>
         /// <param name="logger">A Logger for logging what this service does.</param>
-        public SlashCommandHandlingService(IServiceProvider services, HttpClient http, ILogger<SlashCommandHandlingService> logger)
+        public SlashCommandHandlingService(IServiceProvider services, HttpClient http, ILogger logger)
         {
             _logger = logger;
             _services = services;

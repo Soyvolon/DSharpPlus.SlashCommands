@@ -35,6 +35,7 @@ namespace DSharpPlus.SlashCommands
         }
 
         private readonly IServiceProvider _services;
+        private readonly IServiceProvider _internalServices;
         private readonly SlashCommandHandlingService _slash;
         private readonly DiscordSlashConfiguration _config;
         private readonly BaseDiscordClient? _discord;
@@ -48,24 +49,19 @@ namespace DSharpPlus.SlashCommands
         };
         private const string _contentType = "application/json";
 
-        public DiscordSlashClient(DiscordSlashConfiguration config, IServiceCollection? collection = null)
+        public DiscordSlashClient(DiscordSlashConfiguration config)
         {
-            IServiceCollection services = new ServiceCollection();
-            services.AddSingleton<SlashCommandHandlingService>()
+            IServiceCollection internalServices = new ServiceCollection();
+            internalServices.AddSingleton<SlashCommandHandlingService>()
                 .AddSingleton<HttpClient>()
                 .AddLogging(o => o.AddConsole());
 
-            if(collection is not null)
-            {
-                foreach (var c in collection)
-                    services.Add(c);
-            }
-
-            this._services = services.BuildServiceProvider();
-            this._logger = this._services.GetRequiredService<ILogger<DiscordSlashClient>>();
-            this._slash = this._services.GetRequiredService<SlashCommandHandlingService>();
+            this._services = config.Services ?? new ServiceCollection().BuildServiceProvider();
+            this._internalServices = internalServices.BuildServiceProvider();
+            this._logger = this._internalServices.GetRequiredService<ILogger<DiscordSlashClient>>();
+            this._http = this._internalServices.GetRequiredService<HttpClient>();
+            this._slash = new SlashCommandHandlingService(this._services, this._http, this._logger);
             this._config = config;
-            this._http = this._services.GetRequiredService<HttpClient>();
             this._http.DefaultRequestHeaders.Authorization = new("Bot", this._config.Token);
             this._discord = this._config.Client;
             this._sharded = this._config.ShardedClient;
