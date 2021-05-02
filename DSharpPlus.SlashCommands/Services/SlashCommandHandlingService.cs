@@ -211,8 +211,7 @@ namespace DSharpPlus.SlashCommands.Services
                             && (slashAttr = slashCmdClass.GetCustomAttribute<SlashCommandAttribute>(false)) is not null)
                         { //... if it is a slash command, get or add the SlashCommand for the command ...
                             if (!commands.ContainsKey(slashAttr.Name))
-                                commands.Add(slashAttr.Name, new SlashCommand(slashAttr.Name, 
-                                    slashAttr.Version, 
+                                commands.Add(slashAttr.Name, new SlashCommand(slashAttr.Name,
                                     Array.Empty<SlashSubcommandGroup>(),
                                     slashAttr.GuildId));
 
@@ -303,7 +302,6 @@ namespace DSharpPlus.SlashCommands.Services
                     // ... and the full comamnd object to the command dict.
                     commands.Add(attr.Name,
                         new SlashCommand(attr.Name,
-                            attr.Version,
                             new SlashSubcommand(
                                 attr.Name,
                                 desc: cmd.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "n/a",

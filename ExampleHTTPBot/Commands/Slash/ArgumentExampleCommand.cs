@@ -25,7 +25,7 @@ namespace ExampleBot.Commands.Slash
             service = provider.GetService<TestService>();
         }
 
-        [SlashCommand("args", 1, 750486424469372970)]
+        [SlashCommand("args", 750486424469372970)]
         public async Task ArgumentExampleCommandAsync(InteractionContext ctx, TestChoices choice, int age, string name, bool female,
             DiscordUser user, DiscordChannel channel, DiscordRole role)
         {

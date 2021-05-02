@@ -17,24 +17,24 @@ namespace ExampleGatewayBot.Commands
     {
         public SlashCommandTesting(IServiceProvider p) : base(p) { }
 
-        [SlashCommand("ping", 1, 431462786900688896)]
+        [SlashCommand("ping", 431462786900688896)]
         public async Task SlashCommandTestingAsync(InteractionContext ctx)
             => await ctx.ReplyAsync($"Pong: {Program.Discord.Ping}");
 
-        [SlashCommand("say", 1, 431462786900688896)]
+        [SlashCommand("say", 431462786900688896)]
         public async Task SlashCommandTestingTwoAsync(InteractionContext ctx, string toSay)
             => await ctx.ReplyAsync(toSay);
 
-        [SlashCommand("add", 1, 431462786900688896)]
+        [SlashCommand("add", 431462786900688896)]
         public async Task MathCommandAsync(InteractionContext ctx, int num1, int num2)
             => await ctx.ReplyAsync($"{num1 + num2}");
 
-        [SlashCommand("subtract", 1, 431462786900688896)]
+        [SlashCommand("subtract", 431462786900688896)]
         public async Task SubtractCommandAsync(InteractionContext ctx, int num1, int num3)
             => await ctx.ReplyAsync($"{num1 - num3}");
     }
 
-    [SlashCommand("subs", 1, 431462786900688896)]
+    [SlashCommand("subs", 431462786900688896)]
     public class ArgumentSubcommandCommand : BaseSlashCommandModule
     {
 

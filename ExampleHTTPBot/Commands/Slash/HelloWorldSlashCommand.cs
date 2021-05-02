@@ -25,7 +25,7 @@ namespace ExampleBot.Commands.Slash
             service = provider.GetService<TestService>();
         }
 
-        [SlashCommand("hello", 1, 750486424469372970)]
+        [SlashCommand("hello", 750486424469372970)]
         public async Task HelloWorldSlashCommandAsync(InteractionContext ctx)
         {
             var response = new InteractionResponseBuilder()

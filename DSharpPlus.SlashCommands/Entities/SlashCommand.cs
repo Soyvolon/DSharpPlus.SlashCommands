@@ -12,25 +12,22 @@ namespace DSharpPlus.SlashCommands.Entities
         public ulong? GuildId { get; set; }
         public ulong? CommandId { get; set; }
         public ulong? ApplicationId { get; set; }
-        public int Version { get; set; }
         public SlashSubcommand? Command { get; init; }
 
         public Dictionary<string, SlashSubcommandGroup>? Subcommands { get; init; }
 
-        public SlashCommand(string name, int version, SlashSubcommand command, ulong? gid)
+        public SlashCommand(string name, SlashSubcommand command, ulong? gid)
         {
             Name = name;
-            Version = version;
             Description = command.Description;
             GuildId = gid;
             Command = command;
             Subcommands = null;
         }
 
-        public SlashCommand(string name, int version, SlashSubcommandGroup[] subcommands, ulong? gid, string desc = "n/a")
+        public SlashCommand(string name, SlashSubcommandGroup[] subcommands, ulong? gid, string desc = "n/a")
         {
             Name = name;
-            Version = version;
             Description = desc;
             Subcommands = subcommands.ToDictionary(x => x.Name);
             GuildId = gid;
@@ -88,8 +85,7 @@ namespace DSharpPlus.SlashCommands.Entities
             {
                 CommandId = CommandId ?? throw new Exception("Failed to get a valid command ID"),
                 GuildId = GuildId,
-                Name = Name,
-                Version = Version
+                Name = Name
             };
         }
     }

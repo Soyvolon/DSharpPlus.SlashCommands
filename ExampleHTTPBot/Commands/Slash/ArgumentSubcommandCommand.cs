@@ -16,7 +16,7 @@ using static ExampleBot.Program;
 
 namespace ExampleBot.Commands.Slash
 {
-    [SlashCommand("subs", 1, 750486424469372970)]
+    [SlashCommand("subs", 750486424469372970)]
     public class ArgumentSubcommandCommand : BaseSlashCommandModule
     {
         TestService service;
