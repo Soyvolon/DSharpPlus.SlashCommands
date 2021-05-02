@@ -53,18 +53,36 @@ namespace DSharpPlus.SlashCommands
         {
             IServiceCollection internalServices = new ServiceCollection();
             internalServices.AddSingleton<SlashCommandHandlingService>()
-                .AddSingleton<HttpClient>()
-                .AddLogging(o => o.AddConsole());
+                .AddSingleton<HttpClient>();
+
+            this._config = config;
+            this._discord = this._config.Client;
+            this._sharded = this._config.ShardedClient;
+
+            if (config.Logger is not null)
+            {
+                internalServices.AddSingleton(config.Logger);
+            }
+            else
+            {
+                if (_discord is not null)
+                {
+                    internalServices.AddSingleton(_discord.Logger);
+                }
+                else if (_sharded is not null)
+                {
+                    internalServices.AddSingleton(_sharded!.Logger);
+                }
+            }
 
             this._services = config.Services ?? new ServiceCollection().BuildServiceProvider();
             this._internalServices = internalServices.BuildServiceProvider();
-            this._logger = this._internalServices.GetRequiredService<ILogger<DiscordSlashClient>>();
+            this._logger = config.Logger is null
+                ? this._internalServices.GetRequiredService<ILogger<BaseDiscordClient>>()
+                : (ILogger)this._internalServices.GetRequiredService(config.Logger.GetType());
             this._http = this._internalServices.GetRequiredService<HttpClient>();
             this._slash = new SlashCommandHandlingService(this._services, this._http, this._logger);
-            this._config = config;
             this._http.DefaultRequestHeaders.Authorization = new("Bot", this._config.Token);
-            this._discord = this._config.Client;
-            this._sharded = this._config.ShardedClient;
 
             if (this._discord is null && this._sharded is null)
                 throw new Exception("A Discord Client or Sharded Client is required.");
@@ -318,7 +336,7 @@ namespace DSharpPlus.SlashCommands
 
         protected Uri GetPostFollowupUri(string token)
         {
-            return new Uri($"{api}/webhooks/{ApplicationId}/{token}?wait={_config.WaitForConfirmation}");
+            return new Uri($"{api}/webhooks/{ApplicationId}/{token}");
         }
 
         protected Uri GetEditFollowupUri(string token, ulong messageId)

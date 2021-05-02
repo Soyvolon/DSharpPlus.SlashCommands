@@ -3,6 +3,7 @@
 using DSharpPlus.SlashCommands.Entities;
 using DSharpPlus.SlashCommands.Entities.Builders;
 using DSharpPlus.SlashCommands.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace DSharpPlus.SlashCommands
 {
@@ -29,9 +30,9 @@ namespace DSharpPlus.SlashCommands
         /// </summary>
         public InteractionApplicationCommandCallbackDataBuilder? DefaultResponseData { get; set; } = null;
         /// <summary>
-        /// If Discord is to wait for confirmation that a message has been saved before sending a reply back to the SlashClient.
+        /// Supply a logger to override the DSharpPlus logger.
         /// </summary>
-        public bool WaitForConfirmation { get; set; } = true;
+        public ILogger? Logger { get; set; } = null;
         /// <summary>
         /// Services for dependency injection for slash commands.
         /// </summary>
