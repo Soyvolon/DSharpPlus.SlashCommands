@@ -48,7 +48,8 @@ namespace ExampleGatewayBot
                 Client = Discord,
                 Token = jobj["token"].ToString(),
                 DefaultResponseType = InteractionResponseType.ChannelMessageWithSource,
-                DefaultResponseData = defaultResponseData
+                DefaultResponseData = defaultResponseData,
+                Logger = Discord.Logger
             });
 
             // ... register normal bot commands ...

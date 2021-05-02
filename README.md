@@ -142,7 +142,7 @@ public class DiscordSlashCommandController : ControllerBase
 {
     private readonly ILogger _logger;
 
-    public DiscordSlashCommandController(ILogger<DiscordSlashCommandController> logger)
+    public DiscordSlashCommandController(ILogger logger)
     {
         _logger = logger;
     }
@@ -307,7 +307,7 @@ namespace ExampleBot.Api
     {
         private readonly ILogger _logger;
 
-        public DiscordSlashCommandController(ILogger<DiscordSlashCommandController> logger)
+        public DiscordSlashCommandController(ILogger logger)
         {
             _logger = logger;
         }

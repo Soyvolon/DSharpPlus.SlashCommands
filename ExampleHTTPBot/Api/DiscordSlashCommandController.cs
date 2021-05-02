@@ -23,7 +23,7 @@ namespace ExampleBot.Api
     {
         private readonly ILogger _logger;
 
-        public DiscordSlashCommandController(ILogger<DiscordSlashCommandController> logger)
+        public DiscordSlashCommandController(ILogger logger)
         {
             _logger = logger;
         }

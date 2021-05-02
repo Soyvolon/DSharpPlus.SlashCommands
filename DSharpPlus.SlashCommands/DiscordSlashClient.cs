@@ -77,9 +77,7 @@ namespace DSharpPlus.SlashCommands
 
             this._services = config.Services ?? new ServiceCollection().BuildServiceProvider();
             this._internalServices = internalServices.BuildServiceProvider();
-            this._logger = config.Logger is null
-                ? this._internalServices.GetRequiredService<ILogger<BaseDiscordClient>>()
-                : (ILogger)this._internalServices.GetRequiredService(config.Logger.GetType());
+            this._logger = this._internalServices.GetRequiredService<ILogger>();
             this._http = this._internalServices.GetRequiredService<HttpClient>();
             this._slash = new SlashCommandHandlingService(this._services, this._http, this._logger);
             this._http.DefaultRequestHeaders.Authorization = new("Bot", this._config.Token);
