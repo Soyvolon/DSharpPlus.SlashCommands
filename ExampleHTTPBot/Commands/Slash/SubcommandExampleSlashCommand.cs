@@ -6,7 +6,7 @@ using DSharpPlus.SlashCommands.Entities;
 
 namespace ExampleBot.Commands.Slash
 {
-    [SlashCommand("sub", 1, 750486424469372970)]
+    [SlashCommand("sub", 750486424469372970)]
     public class SubcommandExampleSlashCommand : BaseSlashCommandModule
     {
         // NOTE: This way of DI will change at some point when I get around to making it actual DI
