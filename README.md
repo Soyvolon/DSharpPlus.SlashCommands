@@ -473,12 +473,12 @@ A few things to note:
 Some rules to keep in mind for adding parameters:
 
 *From the [Discord Docs](https://discord.com/developers/docs/interactions/slash-commands#a-quick-note-on-limits)*
-- An app can have up to 50 top-level global commands (50 commands with unique names)
-- An app can have up to an additional 50 guild commands per guild
-- An app can have up to 10 subcommand groups on a top-level command
-- An app can have up to 10 subcommands within a subcommand group
-- `choices` can have up to 10 values per option
-- commands can have up to 10 options per command
+- An app can have up to 100 top-level global commands (50 commands with unique names)
+- An app can have up to an additional 100 guild commands per guild
+- An app can have up to 25 subcommand groups on a top-level command
+- An app can have up to 25 subcommands within a subcommand group
+- commands can have up to 25 options per command
+- `choices` can have up to 25 values per option
 - Limitations on [command names](https://discord.com/developers/docs/interactions/slash-commands#registering-a-command)
 - Limitations on [nesting subcommands and groups](https://discord.com/developers/docs/interactions/slash-commands#nested-subcommands-and-groups)
 ### Using Enums as Parameters for Commands
